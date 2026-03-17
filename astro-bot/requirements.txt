@@ -1,0 +1,8 @@
+requests
+pandas
+python-telegram-bot
+python-binance
+ta>=0.11.0
+sqlalchemy
+nest_asyncio
+aiohttp

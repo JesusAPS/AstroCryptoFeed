@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+shared/data/
+shared/logs/
+.DS_Store
+Thumbs.db
+.gemini/
+.agents/
+node_modules/
+dist/
+build/

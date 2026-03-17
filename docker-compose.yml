@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+
+  astro-bot:
+    build: ./astro-bot
+    container_name: astro-bot
+    env_file:
+      - .env
+    volumes:
+      - ./shared/data:/app/shared/data
+      - ./shared/logs:/app/shared/logs
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    container_name: astro-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./shared/data:/app/shared/data
+    restart: unless-stopped
