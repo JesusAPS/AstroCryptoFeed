@@ -9,6 +9,7 @@ from utils.logger import setup_logger
 from utils.analysis import calculate_technical_indicators, get_signal
 from utils.database import init_db
 from utils.fetch_sentiment import get_fear_and_greed, get_binance_long_short_ratio
+from utils.binance_square import publish_to_binance_square
 from tg_bot.bot_app import create_bot_app
 import nest_asyncio
 from aiohttp import web
@@ -23,6 +24,10 @@ ALERT_PERCENT = float(os.getenv('ALERT_PERCENT', 5.0))
 # Parsear listas de variables de entorno
 BINANCE_PAIRS = os.getenv('BINANCE_PAIRS', 'BTCUSDT').split(',')
 COINGECKO_IDS = os.getenv('COINGECKO_IDS', 'bitcoin').split(',')
+
+# Rastreador de últimas alertas para evitar spam (Diccionario: {simbolo: timestamp})
+last_alerts = {}
+ALERT_COOLDOWN_SECONDS = 3600  # 1 hora de espera entre alertas del mismo par
 
 logger = setup_logger()
 
@@ -82,31 +87,41 @@ async def data_collection_loop():
                         is_technical_alert = "SOBRE" in signal_text
 
                         if is_price_alert or is_technical_alert:
-                            msg = format_alert_message(
-                                binance_data['symbol'], 
-                                binance_data['price'], 
-                                binance_data['change'], 
-                                "Binance",
-                                rsi=current_rsi,
-                                signal=full_signal
-                            )
-                            # Telegram (Enviado de forma sincrona para esta iteración)
-                            send_telegram_alert(msg)
-                            logger.info(f"Alerta enviada para {symbol}")
+                            current_time = time.time()
+                            last_alert_time = last_alerts.get(symbol, 0)
+                            
+                            # Verificar si pasó el tiempo de enfriamiento (cooldown)
+                            if current_time - last_alert_time >= ALERT_COOLDOWN_SECONDS:
+                                msg = format_alert_message(
+                                    binance_data['symbol'], 
+                                    binance_data['price'], 
+                                    binance_data['change'], 
+                                    "Binance",
+                                    rsi=current_rsi,
+                                    signal=full_signal
+                                )
+                                # Telegram (Enviado de forma sincrona para esta iteración)
+                                send_telegram_alert(msg)
+                                logger.info(f"Alerta enviada para {symbol}")
+                                
+                                # Registrar el tiempo de esta alerta
+                                last_alerts[symbol] = current_time
 
-                            # Activepieces Webhook
-                            webhook_data = {
-                                "asset": symbol,
-                                "price": binance_data['price'],
-                                "change_24h": binance_data['change'],
-                                "rsi": current_rsi,
-                                "fear_greed_index": fng_value,
-                                "fear_greed_sentiment": fng_text,
-                                "long_short_ratio": ls_val,
-                                "signal": signal_text,
-                                "source": "Binance"
-                            }
-                            send_activepieces_webhook(webhook_data)
+                                # Activepieces Webhook
+                                webhook_data = {
+                                    "asset": symbol,
+                                    "price": binance_data['price'],
+                                    "change_24h": binance_data['change'],
+                                    "rsi": current_rsi,
+                                    "fear_greed_index": fng_value,
+                                    "fear_greed_sentiment": fng_text,
+                                    "long_short_ratio": ls_val,
+                                    "signal": signal_text,
+                                    "source": "Binance"
+                                }
+                                send_activepieces_webhook(webhook_data)
+                            else:
+                                logger.info(f"Silenciando alerta repetida para {symbol} (Enfriamiento)")
                 except Exception as e:
                     logger.error(f"Error procesando {symbol}: {e}")
                 
@@ -118,18 +133,25 @@ async def data_collection_loop():
                     if coingecko_data:
                         save_data(coingecko_data)
                         if abs(coingecko_data['change']) >= ALERT_PERCENT:
-                            msg = format_alert_message(coingecko_data['token'], coingecko_data['price'], coingecko_data['change'], "CoinGecko")
-                            send_telegram_alert(msg)
-                            logger.info(f"Alerta enviada para {token_id} (CG)")
+                            current_time = time.time()
+                            last_alert_time = last_alerts.get(token_id, 0)
                             
-                            # Activepieces Webhook
-                            webhook_data = {
-                                "asset": token_id,
-                                "price": coingecko_data['price'],
-                                "change_24h": coingecko_data['change'],
-                                "source": "CoinGecko"
-                            }
-                            send_activepieces_webhook(webhook_data)
+                            if current_time - last_alert_time >= ALERT_COOLDOWN_SECONDS:
+                                msg = format_alert_message(coingecko_data['token'], coingecko_data['price'], coingecko_data['change'], "CoinGecko")
+                                send_telegram_alert(msg)
+                                logger.info(f"Alerta enviada para {token_id} (CG)")
+                                last_alerts[token_id] = current_time
+                                
+                                # Activepieces Webhook
+                                webhook_data = {
+                                    "asset": token_id,
+                                    "price": coingecko_data['price'],
+                                    "change_24h": coingecko_data['change'],
+                                    "source": "CoinGecko"
+                                }
+                                send_activepieces_webhook(webhook_data)
+                            else:
+                                logger.info(f"Silenciando alerta repetida para {token_id} (Enfriamiento CG)")
                 except Exception as e:
                     logger.error(f"Error procesando {token_id}: {e}")
 
@@ -156,12 +178,36 @@ async def main():
 
     # --- INICIO DEL SERVIDOR WEB DUMMY PARA RENDER ---
     # Render exige que los "Web Services" escuchen en un puerto HTTP para saber que están vivos.
-    # Si no lo hacemos, Render matará el proceso pensando que falló.
     async def handle_ping(request):
         return web.Response(text="AstroCryptoFeed Bot is alive and running!")
         
+    async def handle_publish_webhook(request):
+        """Webhook para recibir órdenes de publicar desde Activepieces."""
+        try:
+            data = await request.json()
+            content = data.get('content', '')
+            
+            if not content:
+                return web.json_response({'status': 'error', 'message': 'No content provided'}, status=400)
+            
+            logger.info("Recibida orden de publicar desde Activepieces.")
+            
+            # Llamar a la función de publicación
+            success, result = publish_to_binance_square(content)
+            
+            if success:
+                # Aquí podríamos enviar un mensaje de confirmación a Telegram si quisiéramos
+                return web.json_response({'status': 'success', 'data': result})
+            else:
+                return web.json_response({'status': 'error', 'message': result}, status=500)
+                
+        except Exception as e:
+            logger.error(f"Error procesando el webhook de publicación: {e}")
+            return web.json_response({'status': 'error', 'message': str(e)}, status=500)
+
     web_app = web.Application()
     web_app.router.add_get('/', handle_ping)
+    web_app.router.add_post('/webhook/publish', handle_publish_webhook)
     
     # Render asigna el puerto automáticamente en la variable de entorno 'PORT'
     port = int(os.environ.get('PORT', 8080))
