@@ -22,9 +22,10 @@ def publish_to_binance_square(content):
 
     url = BASE_URL + ENDPOINT
 
-    # Encabezados requeridos por la OpenAPI de Binance Square
+    # Encabezados requeridos (Probando ambas variantes comunes para evitar error 220003)
     headers = {
         'X-Square-OpenAPI-Key': BINANCE_API_KEY,
+        'X-Square-Api-Key': BINANCE_API_KEY, # Variante común reportada en foros
         'clienttype': 'binanceSkill',
         'Content-Type': 'application/json'
     }
