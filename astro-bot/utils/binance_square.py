@@ -20,6 +20,9 @@ def publish_to_binance_square(content):
         logger.error("Falta la BINANCE_API_KEY en el .env")
         return False, "Falta API Key"
 
+    # Log de diagnóstico (solo longitud para seguridad)
+    logger.info(f"Diagnóstico: BINANCE_API_KEY cargada (Longitud: {len(BINANCE_API_KEY)})")
+
     url = BASE_URL + ENDPOINT
 
     # Encabezados requeridos (Probando ambas variantes comunes para evitar error 220003)
