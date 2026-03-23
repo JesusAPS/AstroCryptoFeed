@@ -48,24 +48,59 @@
             "sampleData": {},
             "pieceVersion": "~0.11.7",
             "propertySettings": {
-              "url": { "type": "MANUAL" },
-              "body": { "type": "MANUAL", "schema": {} },
-              "method": { "type": "MANUAL" },
-              "headers": { "type": "MANUAL" },
-              "timeout": { "type": "MANUAL" },
-              "authType": { "type": "MANUAL" },
-              "body_type": { "type": "MANUAL" },
-              "use_proxy": { "type": "MANUAL" },
-              "authFields": { "type": "MANUAL", "schema": {} },
-              "failureMode": { "type": "MANUAL" },
-              "queryParams": { "type": "MANUAL" },
-              "proxy_settings": { "type": "MANUAL", "schema": {} },
-              "followRedirects": { "type": "MANUAL" },
-              "response_is_binary": { "type": "MANUAL" }
+              "url": {
+                "type": "MANUAL"
+              },
+              "body": {
+                "type": "MANUAL",
+                "schema": {}
+              },
+              "method": {
+                "type": "MANUAL"
+              },
+              "headers": {
+                "type": "MANUAL"
+              },
+              "timeout": {
+                "type": "MANUAL"
+              },
+              "authType": {
+                "type": "MANUAL"
+              },
+              "body_type": {
+                "type": "MANUAL"
+              },
+              "use_proxy": {
+                "type": "MANUAL"
+              },
+              "authFields": {
+                "type": "MANUAL",
+                "schema": {}
+              },
+              "failureMode": {
+                "type": "MANUAL"
+              },
+              "queryParams": {
+                "type": "MANUAL"
+              },
+              "proxy_settings": {
+                "type": "MANUAL",
+                "schema": {}
+              },
+              "followRedirects": {
+                "type": "MANUAL"
+              },
+              "response_is_binary": {
+                "type": "MANUAL"
+              }
             },
             "errorHandlingOptions": {
-              "retryOnFailure": { "value": false },
-              "continueOnFailure": { "value": false }
+              "retryOnFailure": {
+                "value": false
+              },
+              "continueOnFailure": {
+                "value": false
+              }
             }
           },
           "nextAction": {
@@ -77,7 +112,7 @@
               "input": {
                 "auth": "{{connections['XpbRUZyVktwSfr6qeWKNn']}}",
                 "model": "gemini-2.5-flash",
-                "prompt": "[ROL] Actúa como un estratega de contenido senior de Binance Square y experto en el ecosistema cripto.\n[TAREA Y CONTEXTO] Redactar una publicación corta para Binance Square basada en noticias extraídas del RSS de CoinTelegraph (https://cointelegraph.com/rss). El objetivo es informar a usuarios comunes, generar debate y maximizar clics en cashtags de trading.\n[REGLAS Y RESTRICCIONES]\nGancho (Hook): Empieza con una frase en MAYÚSCULAS y emojis de alerta (ej: 🚨 ¡ATENCIÓN! o 📢 ÚLTIMA HORA). Incluye el beneficio principal de inmediato.\nCuerpo: Explica en máximo 2 frases por qué esto es útil para el usuario.\nMonetización (VITAL): Identifica la criptomoneda principal de la noticia. Si es Bitcoin usa $BTC, si es Binance Coin $BNB, si es Ethereum $ETH, etc. Inserta el Cashtag (con el signo $) al final del cuerpo.\nInteracción: Termina con una pregunta abierta para generar comentarios.\nHashtags: Usa estrictamente #Binance #CryptoNews y 1 hashtag específico del tema.\nFormato: Entrega el resultado en TEXTO PLANO. NO uses negritas (**), cursivas ni símbolos de Markdown para evitar errores de envío en Telegram y Square.\nLongitud: Máximo 1000 caracteres.\n[EJEMPLO DE REFERENCIA] Entrada: Título: \"Binance añade Solana al Staking\" Descripción: \"Usuarios ya pueden ganar recompensas con sus SOL.\" Salida: 📢 ¡GRAN NOTICIA! Ya puedes poner a trabajar tus SOL con Binance Staking. 💰 Binance habilitó nuevas opciones para que ganes recompensas diarias de forma segura. Es el momento ideal para hacer crecer tu portafolio sin esfuerzo adicional. $SOL ¿Ya estás haciendo staking de tus monedas o prefieres tenerlas disponibles? 👇 #Binance #CryptoNews #Solana\n[DATOS DE ENTRADA] A continuación están las noticias del RSS de CoinTelegraph. Elige la más relevante y genera el post:\n{{step_2.body}}",
+                "prompt": "[ROL] Actúa como un redactor automático de Binance Square. Tu ÚNICA función es generar el post final listo para publicar.\n[REGLA ABSOLUTA] Tu respuesta debe contener ÚNICAMENTE el texto del post. PROHIBIDO incluir explicaciones, introducciones, razonamientos, simulaciones, comentarios en cursiva, contexto previo o cualquier texto que no sea parte del post final. Si incluyes algo como 'He elegido esta noticia porque...' o 'Simulando la selección...' habrás FALLADO.\n[TAREA] Redactar una publicación corta para Binance Square basada en noticias cripto de fuentes como CoinTelegraph, Decrypt y CoinDesk.\n[FORMATO OBLIGATORIO]\n1. Gancho: Frase en MAYÚSCULAS con emojis de alerta (🚨 o 📢). Beneficio principal de inmediato.\n2. Cuerpo: Máximo 2 frases explicando por qué es útil para el usuario.\n3. Cashtag: Identifica la cripto principal ($BTC, $ETH, $BNB, $SOL, etc.) e insértalo al final del cuerpo.\n4. Pregunta: Termina con una pregunta abierta para generar comentarios seguida de 👇\n5. Hashtags: Exactamente #Binance #CryptoNews y 1 hashtag específico del tema.\n[RESTRICCIONES]\n- TEXTO PLANO solamente. CERO Markdown (sin **, sin cursivas, sin #títulos).\n- Máximo 1000 caracteres.\n- Escribe en español.\n- NO repitas noticias anteriores, elige la más reciente y relevante.\n[EJEMPLO] 📢 ¡GRAN NOTICIA! Ya puedes poner a trabajar tus SOL con Binance Staking. 💰 Binance habilitó nuevas opciones para que ganes recompensas diarias de forma segura. Es el momento ideal para hacer crecer tu portafolio sin esfuerzo adicional. $SOL ¿Ya estás haciendo staking de tus monedas o prefieres tenerlas disponibles? 👇 #Binance #CryptoNews #Solana\n[NOTICIAS]\n{{step_2.body}}",
                 "toolType": null,
                 "toolProperties": {}
               },
@@ -86,14 +121,27 @@
               "sampleData": {},
               "pieceVersion": "~0.1.4",
               "propertySettings": {
-                "model": { "type": "MANUAL" },
-                "prompt": { "type": "MANUAL" },
-                "toolType": { "type": "MANUAL" },
-                "toolProperties": { "type": "MANUAL", "schema": {} }
+                "model": {
+                  "type": "MANUAL"
+                },
+                "prompt": {
+                  "type": "MANUAL"
+                },
+                "toolType": {
+                  "type": "MANUAL"
+                },
+                "toolProperties": {
+                  "type": "MANUAL",
+                  "schema": {}
+                }
               },
               "errorHandlingOptions": {
-                "retryOnFailure": { "value": false },
-                "continueOnFailure": { "value": false }
+                "retryOnFailure": {
+                  "value": false
+                },
+                "continueOnFailure": {
+                  "value": false
+                }
               }
             },
             "nextAction": {
@@ -115,18 +163,38 @@
                 "sampleData": {},
                 "pieceVersion": "~0.5.6",
                 "propertySettings": {
-                  "format": { "type": "MANUAL" },
-                  "chat_id": { "type": "MANUAL" },
-                  "message": { "type": "MANUAL" },
-                  "instructions": { "type": "MANUAL" },
-                  "reply_markup": { "type": "MANUAL" },
-                  "web_page_preview": { "type": "MANUAL" },
-                  "message_thread_id": { "type": "MANUAL" },
-                  "instructions_format": { "type": "MANUAL" }
+                  "format": {
+                    "type": "MANUAL"
+                  },
+                  "chat_id": {
+                    "type": "MANUAL"
+                  },
+                  "message": {
+                    "type": "MANUAL"
+                  },
+                  "instructions": {
+                    "type": "MANUAL"
+                  },
+                  "reply_markup": {
+                    "type": "MANUAL"
+                  },
+                  "web_page_preview": {
+                    "type": "MANUAL"
+                  },
+                  "message_thread_id": {
+                    "type": "MANUAL"
+                  },
+                  "instructions_format": {
+                    "type": "MANUAL"
+                  }
                 },
                 "errorHandlingOptions": {
-                  "retryOnFailure": { "value": false },
-                  "continueOnFailure": { "value": false }
+                  "retryOnFailure": {
+                    "value": false
+                  },
+                  "continueOnFailure": {
+                    "value": false
+                  }
                 }
               },
               "nextAction": {
@@ -148,16 +216,32 @@
                   "sampleData": {},
                   "pieceVersion": "~0.5.6",
                   "propertySettings": {
-                    "chat_id": { "type": "MANUAL" },
-                    "message": { "type": "MANUAL" },
-                    "parse_mode": { "type": "MANUAL" },
-                    "instructions": { "type": "MANUAL" },
-                    "approve_button_text": { "type": "MANUAL" },
-                    "disapprove_button_text": { "type": "MANUAL" }
+                    "chat_id": {
+                      "type": "MANUAL"
+                    },
+                    "message": {
+                      "type": "MANUAL"
+                    },
+                    "parse_mode": {
+                      "type": "MANUAL"
+                    },
+                    "instructions": {
+                      "type": "MANUAL"
+                    },
+                    "approve_button_text": {
+                      "type": "MANUAL"
+                    },
+                    "disapprove_button_text": {
+                      "type": "MANUAL"
+                    }
                   },
                   "errorHandlingOptions": {
-                    "retryOnFailure": { "value": false },
-                    "continueOnFailure": { "value": false }
+                    "retryOnFailure": {
+                      "value": false
+                    },
+                    "continueOnFailure": {
+                      "value": false
+                    }
                   }
                 },
                 "nextAction": {
@@ -197,7 +281,9 @@
                         "actionName": "send_request",
                         "pieceVersion": "~0.11.7",
                         "propertySettings": {
-                          "url": { "type": "MANUAL" },
+                          "url": {
+                            "type": "MANUAL"
+                          },
                           "body": {
                             "type": "MANUAL",
                             "schema": {
@@ -208,22 +294,52 @@
                               }
                             }
                           },
-                          "method": { "type": "MANUAL" },
-                          "headers": { "type": "MANUAL" },
-                          "timeout": { "type": "MANUAL" },
-                          "authType": { "type": "MANUAL" },
-                          "body_type": { "type": "MANUAL" },
-                          "use_proxy": { "type": "MANUAL" },
-                          "authFields": { "type": "MANUAL", "schema": {} },
-                          "failureMode": { "type": "MANUAL" },
-                          "queryParams": { "type": "MANUAL" },
-                          "proxy_settings": { "type": "MANUAL", "schema": {} },
-                          "followRedirects": { "type": "MANUAL" },
-                          "response_is_binary": { "type": "MANUAL" }
+                          "method": {
+                            "type": "MANUAL"
+                          },
+                          "headers": {
+                            "type": "MANUAL"
+                          },
+                          "timeout": {
+                            "type": "MANUAL"
+                          },
+                          "authType": {
+                            "type": "MANUAL"
+                          },
+                          "body_type": {
+                            "type": "MANUAL"
+                          },
+                          "use_proxy": {
+                            "type": "MANUAL"
+                          },
+                          "authFields": {
+                            "type": "MANUAL",
+                            "schema": {}
+                          },
+                          "failureMode": {
+                            "type": "MANUAL"
+                          },
+                          "queryParams": {
+                            "type": "MANUAL"
+                          },
+                          "proxy_settings": {
+                            "type": "MANUAL",
+                            "schema": {}
+                          },
+                          "followRedirects": {
+                            "type": "MANUAL"
+                          },
+                          "response_is_binary": {
+                            "type": "MANUAL"
+                          }
                         },
                         "errorHandlingOptions": {
-                          "retryOnFailure": { "value": false },
-                          "continueOnFailure": { "value": false }
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
                         }
                       },
                       "displayName": "Publicar en Binance Square",
@@ -248,18 +364,38 @@
                         "sampleData": {},
                         "pieceVersion": "~0.5.6",
                         "propertySettings": {
-                          "format": { "type": "MANUAL" },
-                          "chat_id": { "type": "MANUAL" },
-                          "message": { "type": "MANUAL" },
-                          "instructions": { "type": "MANUAL" },
-                          "reply_markup": { "type": "MANUAL" },
-                          "web_page_preview": { "type": "MANUAL" },
-                          "message_thread_id": { "type": "MANUAL" },
-                          "instructions_format": { "type": "MANUAL" }
+                          "format": {
+                            "type": "MANUAL"
+                          },
+                          "chat_id": {
+                            "type": "MANUAL"
+                          },
+                          "message": {
+                            "type": "MANUAL"
+                          },
+                          "instructions": {
+                            "type": "MANUAL"
+                          },
+                          "reply_markup": {
+                            "type": "MANUAL"
+                          },
+                          "web_page_preview": {
+                            "type": "MANUAL"
+                          },
+                          "message_thread_id": {
+                            "type": "MANUAL"
+                          },
+                          "instructions_format": {
+                            "type": "MANUAL"
+                          }
                         },
                         "errorHandlingOptions": {
-                          "retryOnFailure": { "value": false },
-                          "continueOnFailure": { "value": false }
+                          "retryOnFailure": {
+                            "value": false
+                          },
+                          "continueOnFailure": {
+                            "value": false
+                          }
                         }
                       },
                       "displayName": "Enviar mensaje de rechazo",
@@ -310,15 +446,19 @@
         "settings": {
           "sampleData": {},
           "propertySettings": {
-            "timezone": { "type": "MANUAL" },
-            "cronExpression": { "type": "MANUAL" }
+            "timezone": {
+              "type": "MANUAL"
+            },
+            "cronExpression": {
+              "type": "MANUAL"
+            }
           },
           "pieceName": "@activepieces/piece-schedule",
           "pieceVersion": "~0.1.17",
           "triggerName": "cron_expression",
           "input": {
             "timezone": "America/Caracas",
-            "cronExpression": "0 8,16,20 * * *"
+            "cronExpression": "0 7,10,13,16,19,22 * * *"
           }
         }
       },

@@ -5,6 +5,7 @@ from utils.fetch_binance import get_binance_data, get_historical_klines
 from utils.fetch_coingecko import get_coingecko_data
 from utils.save import save_data
 from utils.notify import send_telegram_alert, send_activepieces_webhook
+from utils.api_key_monitor import check_api_key_expiry
 from utils.logger import setup_logger
 from utils.analysis import calculate_technical_indicators, get_signal
 from utils.database import init_db
@@ -94,6 +95,7 @@ async def data_collection_loop():
                         # Alertas
                         is_price_alert = abs(binance_data['change']) >= ALERT_PERCENT
                         is_technical_alert = "SOBRE" in signal_text
+                        is_extreme_rsi = current_rsi < 30 or current_rsi > 70
 
                         if is_price_alert or is_technical_alert:
                             current_time = time.time()
@@ -184,6 +186,9 @@ async def main():
     logger.info("🚀 Astro-Bot iniciado")
     logger.info(f"Configuración: {len(BINANCE_PAIRS)} pares en Binance y {len(COINGECKO_IDS)} en CoinGecko")
     
+    # Verificar expiración de API Key de Binance Square
+    check_api_key_expiry()
+    
     # Iniciar la aplicación de Telegram interactiva
     app = create_bot_app()
     if app:
@@ -213,9 +218,17 @@ async def main():
             success, result = publish_to_binance_square(content)
             
             if success:
-                # Aquí podríamos enviar un mensaje de confirmación a Telegram si quisiéramos
+                # Enviar confirmación a Telegram con el link del post
+                share_link = ""
+                if isinstance(result, dict):
+                    share_link = result.get('data', {}).get('shareLink', '')
+                confirm_msg = f"✅ *Publicado en Binance Square*\n🔗 [Ver post]({share_link})" if share_link else "✅ *Publicado exitosamente en Binance Square*"
+                send_telegram_alert(confirm_msg)
                 return web.json_response({'status': 'success', 'data': result})
             else:
+                # Detectar si la API Key expiró y avisar
+                if '220004' in str(result):
+                    send_telegram_alert("🔑 *Tu API Key de Binance Square expiró.* Genera una nueva en Binance → Square → OpenAPI Settings y actualízala en Render.")
                 return web.json_response({'status': 'error', 'message': result}, status=500)
                 
         except Exception as e:

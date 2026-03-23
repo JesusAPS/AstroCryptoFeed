@@ -17,7 +17,10 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             InlineKeyboardButton("📈 Precio BTC", callback_data='price_BTCUSDT'),
             InlineKeyboardButton("📈 Precio ETH", callback_data='price_ETHUSDT')
         ],
-        [InlineKeyboardButton("📊 Abrir Dashboard Web", url="http://localhost:8501")]
+        [
+            InlineKeyboardButton("📈 Precio BNB", callback_data='price_BNBUSDT'),
+            InlineKeyboardButton("📈 Precio SOL", callback_data='price_SOLUSDT')
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -94,6 +97,48 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         else:
             await query.edit_message_text(text="Error obteniendo el precio en este momento.")
 
+async def week_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Muestra estadísticas semanales: top monedas más volátiles de los últimos 7 días."""
+    try:
+        engine = get_engine()
+        query_sql = """
+            SELECT symbol, 
+                   MIN(price) as min_price, 
+                   MAX(price) as max_price,
+                   AVG(change_24h) as avg_change,
+                   MAX(ABS(change_24h)) as max_volatility,
+                   COUNT(*) as data_points
+            FROM prices 
+            WHERE timestamp >= datetime('now', '-7 days')
+              AND source = 'Binance'
+            GROUP BY symbol 
+            ORDER BY max_volatility DESC 
+            LIMIT 5
+        """
+        df = pd.read_sql(query_sql, engine)
+        
+        if df.empty:
+            await update.message.reply_text("No hay suficientes datos de la última semana aún.")
+            return
+        
+        msg = "📊 *Resumen Semanal — Top 5 Volátiles:*\n\n"
+        for _, row in df.iterrows():
+            emoji = "🔥" if row['max_volatility'] > 5 else "📈"
+            price_range = f"${row['min_price']:.2f} - ${row['max_price']:.2f}"
+            msg += (
+                f"{emoji} `{row['symbol']}`\n"
+                f"   Rango: {price_range}\n"
+                f"   Mayor movimiento: `{row['max_volatility']:.2f}%`\n"
+                f"   Datos: {int(row['data_points'])} lecturas\n\n"
+            )
+        
+        msg += "_Período: últimos 7 días_"
+        await update.message.reply_text(msg, parse_mode='Markdown')
+        
+    except Exception as e:
+        logger.error(f"Error en /semana: {e}")
+        await update.message.reply_text("Error calculando las estadísticas semanales.")
+
 def create_bot_app():
     """Construye y devuelve la aplicación de telegram lista para correr."""
     if not TELEGRAM_BOT_TOKEN:
@@ -105,6 +150,8 @@ def create_bot_app():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("precio", price_command))
     app.add_handler(CommandHandler("resumen", resume_command))
+    app.add_handler(CommandHandler("semana", week_command))
     app.add_handler(CallbackQueryHandler(button_callback))
     
     return app
+
