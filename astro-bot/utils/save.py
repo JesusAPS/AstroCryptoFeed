@@ -16,8 +16,10 @@ def save_data(data, filename=None): # filename se mantiene por compatibilidad pe
                 symbol=data.get('symbol') or data.get('token'),
                 price=data['price'],
                 change_24h=data['change'],
-                volume=data.get('volume'), # Puede ser None (CoinGecko)
-                rsi=data.get('rsi'),       # Puede ser None
+                volume=data.get('volume'),
+                rsi=data.get('rsi'),
+                fear_greed=data.get('fear_greed'),
+                long_short_ratio=data.get('long_short_ratio'),
                 source="Binance" if 'symbol' in data else "CoinGecko"
             )
 

@@ -10,6 +10,7 @@ from utils.analysis import calculate_technical_indicators, get_signal
 from utils.database import init_db
 from utils.fetch_sentiment import get_fear_and_greed, get_binance_long_short_ratio
 from utils.binance_square import publish_to_binance_square
+from utils.format import get_crypto_tags
 from tg_bot.bot_app import create_bot_app
 import nest_asyncio
 from aiohttp import web
@@ -31,7 +32,7 @@ ALERT_COOLDOWN_SECONDS = 3600  # 1 hora de espera entre alertas del mismo par
 
 logger = setup_logger()
 
-def format_alert_message(name, price, change, source, rsi=None, signal="NEUTRAL"):
+def format_alert_message(name, price, change, source, rsi=None, signal="NEUTRAL", fear_greed=None, ls_ratio=None):
     arrow = "📈" if change > 0 else "📉"
     
     msg = (
@@ -44,7 +45,15 @@ def format_alert_message(name, price, change, source, rsi=None, signal="NEUTRAL"
     if rsi is not None:
         msg += f"*RSI (14):* `{rsi:.2f}`\n"
         msg += f"*Señal Técnica:* {signal}\n"
+
+    if fear_greed is not None:
+        msg += f"*Índice Miedo/Codicia:* `{fear_greed}`\n"
+
+    if ls_ratio is not None:
+        msg += f"*Ratio Long/Short:* `{ls_ratio:.2f}`\n"
         
+    cashtag, hashtags = get_crypto_tags(name)
+    msg += f"\n{cashtag} {hashtags}\n"
     msg += f"_Fuente: {source}_"
     return msg
 
@@ -98,7 +107,9 @@ async def data_collection_loop():
                                     binance_data['change'], 
                                     "Binance",
                                     rsi=current_rsi,
-                                    signal=full_signal
+                                    signal=full_signal,
+                                    fear_greed=fng_value,
+                                    ls_ratio=ls_val
                                 )
                                 # Telegram (Enviado de forma sincrona para esta iteración)
                                 send_telegram_alert(msg)
@@ -108,8 +119,11 @@ async def data_collection_loop():
                                 last_alerts[symbol] = current_time
 
                                 # Activepieces Webhook
+                                cashtag, hashtags = get_crypto_tags(symbol)
                                 webhook_data = {
                                     "asset": symbol,
+                                    "cashtag": cashtag,
+                                    "hashtags": hashtags,
                                     "price": binance_data['price'],
                                     "change_24h": binance_data['change'],
                                     "rsi": current_rsi,
@@ -143,8 +157,11 @@ async def data_collection_loop():
                                 last_alerts[token_id] = current_time
                                 
                                 # Activepieces Webhook
+                                cashtag, hashtags = get_crypto_tags(token_id)
                                 webhook_data = {
                                     "asset": token_id,
+                                    "cashtag": cashtag,
+                                    "hashtags": hashtags,
                                     "price": coingecko_data['price'],
                                     "change_24h": coingecko_data['change'],
                                     "source": "CoinGecko"

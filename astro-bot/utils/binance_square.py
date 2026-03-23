@@ -4,8 +4,8 @@ from utils.logger import setup_logger
 
 logger = setup_logger()
 
-# Configuración API Binance
-BINANCE_API_KEY = os.getenv('BINANCE_API_KEY')
+# Configuración API Binance Square
+BINANCE_SQUARE_API_KEY = os.getenv('BINANCE_SQUARE_API_KEY')
 
 # Endpoint Oficial de Binance Square (OpenAPI)
 BASE_URL = 'https://www.binance.com'
@@ -16,19 +16,18 @@ def publish_to_binance_square(content):
     Publica contenido en Binance Square usando la OpenAPI oficial de Square.
     Requiere una API Key generada específicamente para Binance Square.
     """
-    if not BINANCE_API_KEY:
-        logger.error("Falta la BINANCE_API_KEY en el .env")
+    if not BINANCE_SQUARE_API_KEY:
+        logger.error("Falta la BINANCE_SQUARE_API_KEY en el .env")
         return False, "Falta API Key"
 
     # Log de diagnóstico (solo longitud para seguridad)
-    logger.info(f"Diagnóstico: BINANCE_API_KEY cargada (Longitud: {len(BINANCE_API_KEY)})")
+    logger.info(f"Diagnóstico: BINANCE_SQUARE_API_KEY cargada (Longitud: {len(BINANCE_SQUARE_API_KEY)})")
 
     url = BASE_URL + ENDPOINT
 
-    # Encabezados requeridos (Probando ambas variantes comunes para evitar error 220003)
+    # Encabezados requeridos para Binance Square OpenAPI
     headers = {
-        'X-Square-OpenAPI-Key': BINANCE_API_KEY,
-        'X-Square-Api-Key': BINANCE_API_KEY, # Variante común reportada en foros
+        'X-Square-Api-Key': BINANCE_SQUARE_API_KEY,
         'clienttype': 'binanceSkill',
         'Content-Type': 'application/json'
     }
