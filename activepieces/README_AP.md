@@ -49,30 +49,35 @@ Activepieces incluye una pieza nativa para **Google Gemini**. Puedes usarlo para
 
 *💡 Tip Pro:* Pasa los datos de SQLite o los JSON del bot (ej: `Precio de BTC: $95,000, RSI en 70`) a este prompt en lugar de (o junto con) simples noticias RSS para que la IA haga análisis técnico en tiempo real.
 
-## 5. Publicación y Aprobación por Telegram (El Flujo Elegido)
+## 5. El Flujo Maestro (Configuración Real)
 
-Para mantener el control y asegurar la calidad, usaremos el sistema de **Aprobación Humana vía Telegram** antes de publicar en Binance Square.
+Basado en la configuración actual (`Automatizacion.json`), el flujo trabaja así:
 
-El flujo sugerido en Activepieces es:
-1.  **Gatillo (Trigger):** Pieza de **RSS** (Blog de Binance) o Webhook de Astro-Bot.
-2.  **IA:** Pieza de **Gemini** lee la noticia y genera el borrador.
-3.  **Acción (Telegram):** La pieza de **Telegram** te envía el borrador para aprobación.
+1.  **Gatillo (Trigger):** Pieza de **Schedule** (Programación). Configurado para las **8:00, 16:00 y 20:00** (Hora de Caracas).
+2.  **Extracción de Noticias:** Pieza de **HTTP** que consulta el RSS de `cointelegraph.com/rss`.
+3.  **Cerebro (IA):** Pieza de **Google Gemini** redacta el post optimizado usando el **Prompt Maestro**.
+4.  **Notificación de Filtro:** Pieza de **Telegram** te envía el borrador para que lo leas.
+5.  **Solicitud de Aprobación:** Pieza de **Telegram (Request Approval)** que muestra dos botones en tu chat:
+    *   `✅ Aprobar`: Envía el contenido a publicar.
+    *   `🔄 Generar otro (Reintentar)`: Descarta el post actual.
+6.  **Publicación Técnica (Router):** 
+    *   Si pulsas **Aprobar**, Activepieces hace un `POST` a tu bot en Render: `https://astrocryptofeed.onrender.com/webhook/publish`.
+    *   Tu bot recibe el texto y usa la **API Oficial de Binance Square** para publicar.
 
-### 📦 Configuración del Mensaje de Telegram
-Configura el campo de "Text" en tu pieza de Telegram exactamente así:
+### 📦 Configuración del Payload (Paso Crítico)
+En el paso final de **HTTP (POST)**, la configuración debe ser:
+- **URL:** `https://astrocryptofeed.onrender.com/webhook/publish`
+- **Method:** `POST`
+- **Headers:** `Content-Type: application/json`
+- **Body (JSON):**
+  ```json
+  {
+    "content": "{{step_1.output}}" 
+  }
+  ```
+  *(Asegúrate de que `step_1` sea el resultado del paso de Gemini).*
 
-```text
-📦 NUEVO POST PARA BINANCE SQUARE
-
-Contenido sugerido por Gemini:
-{{step_de_gemini.output}}
-
-🔗 Noticia original: {{trigger.link}}
-```
-
-4.  **Aprobación/Publicación:** Lees el mensaje de Telegram, lo copias y lo publicas manualmente en Binance Square.
-
-*(Decidimos no usar la Opción A - Publicación Directa automática para siempre revisar lo que la IA escriba primero).*
+*Nota: Hemos pasado de la publicación manual a un sistema de **"Un solo clic"** desde Telegram.*
 
 ## 6. Siguientes Pasos (Otras Acciones)
 Si no usas Binance Square, recuerda que también puedes conectar herramientas como:
