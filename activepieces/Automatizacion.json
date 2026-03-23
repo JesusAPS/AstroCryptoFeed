@@ -1,0 +1,331 @@
+{
+  "name": "Automatizacion",
+  "type": "SHARED",
+  "summary": "",
+  "description": "",
+  "tags": [],
+  "blogUrl": "",
+  "metadata": {
+    "externalId": "NMnfzoTy5w5oumm212eOZ"
+  },
+  "author": "Jesús Padron",
+  "categories": [],
+  "pieces": [
+    "@activepieces/piece-schedule",
+    "@activepieces/piece-http",
+    "@activepieces/piece-google-gemini",
+    "@activepieces/piece-telegram-bot"
+  ],
+  "flows": [
+    {
+      "displayName": "Automatizacion",
+      "trigger": {
+        "name": "trigger",
+        "valid": true,
+        "displayName": "Activación del Bot",
+        "nextAction": {
+          "name": "step_2",
+          "type": "PIECE",
+          "valid": true,
+          "settings": {
+            "input": {
+              "url": "https://cointelegraph.com/rss",
+              "body": {},
+              "method": "GET",
+              "headers": {},
+              "authType": "NONE",
+              "body_type": "none",
+              "use_proxy": false,
+              "authFields": {},
+              "failureMode": "continue_none",
+              "queryParams": {},
+              "proxy_settings": {},
+              "followRedirects": false,
+              "response_is_binary": false
+            },
+            "pieceName": "@activepieces/piece-http",
+            "actionName": "send_request",
+            "sampleData": {},
+            "pieceVersion": "~0.11.7",
+            "propertySettings": {
+              "url": { "type": "MANUAL" },
+              "body": { "type": "MANUAL", "schema": {} },
+              "method": { "type": "MANUAL" },
+              "headers": { "type": "MANUAL" },
+              "timeout": { "type": "MANUAL" },
+              "authType": { "type": "MANUAL" },
+              "body_type": { "type": "MANUAL" },
+              "use_proxy": { "type": "MANUAL" },
+              "authFields": { "type": "MANUAL", "schema": {} },
+              "failureMode": { "type": "MANUAL" },
+              "queryParams": { "type": "MANUAL" },
+              "proxy_settings": { "type": "MANUAL", "schema": {} },
+              "followRedirects": { "type": "MANUAL" },
+              "response_is_binary": { "type": "MANUAL" }
+            },
+            "errorHandlingOptions": {
+              "retryOnFailure": { "value": false },
+              "continueOnFailure": { "value": false }
+            }
+          },
+          "nextAction": {
+            "name": "step_1",
+            "skip": false,
+            "type": "PIECE",
+            "valid": true,
+            "settings": {
+              "input": {
+                "auth": "{{connections['XpbRUZyVktwSfr6qeWKNn']}}",
+                "model": "gemini-2.5-flash",
+                "prompt": "[ROL] Actúa como un estratega de contenido senior de Binance Square y experto en el ecosistema cripto.\n[TAREA Y CONTEXTO] Redactar una publicación corta para Binance Square basada en noticias extraídas del RSS de CoinTelegraph (https://cointelegraph.com/rss). El objetivo es informar a usuarios comunes, generar debate y maximizar clics en cashtags de trading.\n[REGLAS Y RESTRICCIONES]\nGancho (Hook): Empieza con una frase en MAYÚSCULAS y emojis de alerta (ej: 🚨 ¡ATENCIÓN! o 📢 ÚLTIMA HORA). Incluye el beneficio principal de inmediato.\nCuerpo: Explica en máximo 2 frases por qué esto es útil para el usuario.\nMonetización (VITAL): Identifica la criptomoneda principal de la noticia. Si es Bitcoin usa $BTC, si es Binance Coin $BNB, si es Ethereum $ETH, etc. Inserta el Cashtag (con el signo $) al final del cuerpo.\nInteracción: Termina con una pregunta abierta para generar comentarios.\nHashtags: Usa estrictamente #Binance #CryptoNews y 1 hashtag específico del tema.\nFormato: Entrega el resultado en TEXTO PLANO. NO uses negritas (**), cursivas ni símbolos de Markdown para evitar errores de envío en Telegram y Square.\nLongitud: Máximo 1000 caracteres.\n[EJEMPLO DE REFERENCIA] Entrada: Título: \"Binance añade Solana al Staking\" Descripción: \"Usuarios ya pueden ganar recompensas con sus SOL.\" Salida: 📢 ¡GRAN NOTICIA! Ya puedes poner a trabajar tus SOL con Binance Staking. 💰 Binance habilitó nuevas opciones para que ganes recompensas diarias de forma segura. Es el momento ideal para hacer crecer tu portafolio sin esfuerzo adicional. $SOL ¿Ya estás haciendo staking de tus monedas o prefieres tenerlas disponibles? 👇 #Binance #CryptoNews #Solana\n[DATOS DE ENTRADA] A continuación están las noticias del RSS de CoinTelegraph. Elige la más relevante y genera el post:\n{{step_2.body}}",
+                "toolType": null,
+                "toolProperties": {}
+              },
+              "pieceName": "@activepieces/piece-google-gemini",
+              "actionName": "generate_content",
+              "sampleData": {},
+              "pieceVersion": "~0.1.4",
+              "propertySettings": {
+                "model": { "type": "MANUAL" },
+                "prompt": { "type": "MANUAL" },
+                "toolType": { "type": "MANUAL" },
+                "toolProperties": { "type": "MANUAL", "schema": {} }
+              },
+              "errorHandlingOptions": {
+                "retryOnFailure": { "value": false },
+                "continueOnFailure": { "value": false }
+              }
+            },
+            "nextAction": {
+              "name": "step_4",
+              "skip": false,
+              "type": "PIECE",
+              "valid": true,
+              "settings": {
+                "input": {
+                  "auth": "{{connections['sjGWK712zYSoAEwnMITeL']}}",
+                  "format": "HTML",
+                  "chat_id": "1540989235",
+                  "message": "{{step_1}}",
+                  "reply_markup": {},
+                  "web_page_preview": false
+                },
+                "pieceName": "@activepieces/piece-telegram-bot",
+                "actionName": "send_text_message",
+                "sampleData": {},
+                "pieceVersion": "~0.5.6",
+                "propertySettings": {
+                  "format": { "type": "MANUAL" },
+                  "chat_id": { "type": "MANUAL" },
+                  "message": { "type": "MANUAL" },
+                  "instructions": { "type": "MANUAL" },
+                  "reply_markup": { "type": "MANUAL" },
+                  "web_page_preview": { "type": "MANUAL" },
+                  "message_thread_id": { "type": "MANUAL" },
+                  "instructions_format": { "type": "MANUAL" }
+                },
+                "errorHandlingOptions": {
+                  "retryOnFailure": { "value": false },
+                  "continueOnFailure": { "value": false }
+                }
+              },
+              "nextAction": {
+                "name": "step_3",
+                "skip": false,
+                "type": "PIECE",
+                "valid": true,
+                "settings": {
+                  "input": {
+                    "auth": "{{connections['sjGWK712zYSoAEwnMITeL']}}",
+                    "chat_id": "1540989235",
+                    "message": "✅ Publicar en Square",
+                    "parse_mode": "MarkdownV2",
+                    "approve_button_text": "✅ Aprobar",
+                    "disapprove_button_text": "🔄 Generar otro (Reintentar)"
+                  },
+                  "pieceName": "@activepieces/piece-telegram-bot",
+                  "actionName": "request_approval_message",
+                  "sampleData": {},
+                  "pieceVersion": "~0.5.6",
+                  "propertySettings": {
+                    "chat_id": { "type": "MANUAL" },
+                    "message": { "type": "MANUAL" },
+                    "parse_mode": { "type": "MANUAL" },
+                    "instructions": { "type": "MANUAL" },
+                    "approve_button_text": { "type": "MANUAL" },
+                    "disapprove_button_text": { "type": "MANUAL" }
+                  },
+                  "errorHandlingOptions": {
+                    "retryOnFailure": { "value": false },
+                    "continueOnFailure": { "value": false }
+                  }
+                },
+                "nextAction": {
+                  "name": "step_5",
+                  "skip": false,
+                  "type": "ROUTER",
+                  "valid": true,
+                  "children": [
+                    {
+                      "name": "step_6",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "url": "https://astrocryptofeed.onrender.com/webhook/publish",
+                          "body": {
+                            "data": {
+                              "content": "{{step_1}}"
+                            }
+                          },
+                          "method": "POST",
+                          "headers": {
+                            "Content-Type": "application/json"
+                          },
+                          "authType": "NONE",
+                          "body_type": "json",
+                          "use_proxy": false,
+                          "authFields": {},
+                          "failureMode": "continue_none",
+                          "queryParams": {},
+                          "proxy_settings": {},
+                          "followRedirects": false,
+                          "response_is_binary": false
+                        },
+                        "pieceName": "@activepieces/piece-http",
+                        "actionName": "send_request",
+                        "pieceVersion": "~0.11.7",
+                        "propertySettings": {
+                          "url": { "type": "MANUAL" },
+                          "body": {
+                            "type": "MANUAL",
+                            "schema": {
+                              "data": {
+                                "type": "JSON",
+                                "required": true,
+                                "displayName": "JSON Body"
+                              }
+                            }
+                          },
+                          "method": { "type": "MANUAL" },
+                          "headers": { "type": "MANUAL" },
+                          "timeout": { "type": "MANUAL" },
+                          "authType": { "type": "MANUAL" },
+                          "body_type": { "type": "MANUAL" },
+                          "use_proxy": { "type": "MANUAL" },
+                          "authFields": { "type": "MANUAL", "schema": {} },
+                          "failureMode": { "type": "MANUAL" },
+                          "queryParams": { "type": "MANUAL" },
+                          "proxy_settings": { "type": "MANUAL", "schema": {} },
+                          "followRedirects": { "type": "MANUAL" },
+                          "response_is_binary": { "type": "MANUAL" }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": { "value": false },
+                          "continueOnFailure": { "value": false }
+                        }
+                      },
+                      "displayName": "Publicar en Binance Square",
+                      "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+                    },
+                    {
+                      "name": "step_7",
+                      "skip": false,
+                      "type": "PIECE",
+                      "valid": true,
+                      "settings": {
+                        "input": {
+                          "auth": "{{connections['sjGWK712zYSoAEwnMITeL']}}",
+                          "format": "HTML",
+                          "chat_id": "1540989235",
+                          "message": "Entendido, descartando este post. Intentaré generar uno mejor en la próxima actualización automática.",
+                          "reply_markup": {},
+                          "web_page_preview": false
+                        },
+                        "pieceName": "@activepieces/piece-telegram-bot",
+                        "actionName": "send_text_message",
+                        "sampleData": {},
+                        "pieceVersion": "~0.5.6",
+                        "propertySettings": {
+                          "format": { "type": "MANUAL" },
+                          "chat_id": { "type": "MANUAL" },
+                          "message": { "type": "MANUAL" },
+                          "instructions": { "type": "MANUAL" },
+                          "reply_markup": { "type": "MANUAL" },
+                          "web_page_preview": { "type": "MANUAL" },
+                          "message_thread_id": { "type": "MANUAL" },
+                          "instructions_format": { "type": "MANUAL" }
+                        },
+                        "errorHandlingOptions": {
+                          "retryOnFailure": { "value": false },
+                          "continueOnFailure": { "value": false }
+                        }
+                      },
+                      "displayName": "Enviar mensaje de rechazo",
+                      "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+                    }
+                  ],
+                  "settings": {
+                    "branches": [
+                      {
+                        "branchName": "Aprobado",
+                        "branchType": "CONDITION",
+                        "conditions": [
+                          [
+                            {
+                              "operator": "TEXT_EXACTLY_MATCHES",
+                              "firstValue": "{{step_3['approved']}}",
+                              "secondValue": "True",
+                              "caseSensitive": false
+                            }
+                          ]
+                        ]
+                      },
+                      {
+                        "branchName": "Rechazado",
+                        "branchType": "FALLBACK"
+                      }
+                    ],
+                    "sampleData": {},
+                    "executionType": "EXECUTE_FIRST_MATCH"
+                  },
+                  "displayName": "Decisión de Publicación",
+                  "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+                },
+                "displayName": "Solicitar aprobación por Telegram",
+                "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+              },
+              "displayName": "Enviar borrador a Telegram",
+              "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+            },
+            "displayName": "Generar contenido con Gemini (CoinTelegraph)",
+            "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+          },
+          "displayName": "Extraer noticias de CoinTelegraph (RSS)",
+          "lastUpdatedDate": "2026-03-22T23:35:00.000Z"
+        },
+        "lastUpdatedDate": "2026-03-22T23:35:00.000Z",
+        "type": "PIECE_TRIGGER",
+        "settings": {
+          "sampleData": {},
+          "propertySettings": {
+            "timezone": { "type": "MANUAL" },
+            "cronExpression": { "type": "MANUAL" }
+          },
+          "pieceName": "@activepieces/piece-schedule",
+          "pieceVersion": "~0.1.17",
+          "triggerName": "cron_expression",
+          "input": {
+            "timezone": "America/Caracas",
+            "cronExpression": "0 8,16,20 * * *"
+          }
+        }
+      },
+      "valid": true,
+      "schemaVersion": "18",
+      "notes": []
+    }
+  ],
+  "status": "PUBLISHED"
+}
