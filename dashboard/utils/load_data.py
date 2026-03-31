@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-# Ruta compartida
+# Aquí es donde vive la base de datos compartida por todos
 DB_PATH = 'sqlite:////app/shared/data/crypto_data.db'
 
 def get_engine():
@@ -16,6 +16,7 @@ def load_data_from_db(source, symbol=None, limit=100):
             query = f"SELECT * FROM prices WHERE source='{source}' ORDER BY timestamp DESC LIMIT {limit}"
             
         df = pd.read_sql(query, engine)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
         return df.sort_values(by='timestamp')
     except Exception as e:
         return pd.DataFrame()
@@ -37,16 +38,16 @@ def load_coingecko_data(symbol=None, limit=100):
 
 def get_aligned_prices(source="Binance", limit=500):
     """
-    Obtiene los precios de todos los símbolos, los alinea por timestamp
-    (resampleando por horas) para calcular correlaciones.
+    Un método para juntar todos los precios y alinearlos perfectamente por hora
+    para poder calcular las correlaciones sin errores.
     """
     symbols = get_available_symbols(source)
     prices_dict = {}
     for sym in symbols:
         df = load_data_from_db(source, sym, limit)
         if not df.empty:
-            # Resample de la serie temporal por horas para alinear datos
-            # Técnicas de Pandas vitales para el Data Analysis
+            # Usando mi magia de Resample para que todos los activos coincidan en el tiempo.
+            # Estos son los trucos de Pandas que me hacen la vida más fácil.
             df_sym = df.set_index('timestamp').resample('1h')['price'].last()
             prices_dict[sym] = df_sym
             

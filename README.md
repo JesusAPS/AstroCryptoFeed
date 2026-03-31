@@ -1,73 +1,68 @@
-# 🪐 AstroCryptoFeed - Mi Proyecto de Datos Cripto
+# 🪐 AstroCryptoFeed - El Laboratorio Cripto de un Científico Loco 🚀
 
-¡Hola! Bienvenido a **AstroCryptoFeed**. Este es un proyecto personal que nació de pura curiosidad por el mundo cripto y los datos. En esencia, es un pipeline automatizado que monitorea precios de criptomonedas (Binance y CoinGecko), los almacena, calcula indicadores financieros y los visualiza tanto en una web interactiva como en Power BI, llevándolo mucho más allá de una simple alerta de Telegram.
-
-## 🧠 La Historia del Proyecto: Problemas y Soluciones
-
-Cuando empecé este proyecto, mi idea original era muy simple: **quería un bot de Telegram que me avisara si el Bitcoin subía o bajaba mucho.** Pero a medida que fui armando todo, me di cuenta de que tenía frente a mí una oportunidad perfecta para aprender un montón de cosas y armar algo súper completo. Aquí te cuento cómo evolucionó y los retos que superé probando mis propias ideas:
-
-### 1. El problema del almacenamiento (CSV vs Base de Datos)
-Al principio, el bot guardaba los precios en archivos `.csv`. **El problema:** Rápidamente los CSV se volvieron pesados, difíciles de consultar y propensos a errores si el bot y el dashboard intentaban leer/escribir al mismo tiempo. 
-✅ **Mi solución:** Migré toda la capa de persistencia a una base de datos **SQLite** usando SQLAlchemy. Esto me permitió abstraer la lógica, hacer consultas SQL estructuradas (`SELECT * FROM prices WHERE...`) y garantizar la integridad de los datos entre los distintos contenedores Docker.
-
-### 2. Ver datos en la terminal vs verlo con gráficos
-Tener un script en Python corriendo en la terminal es genial, pero después de un rato **el problema** es que me di cuenta de que sería mucho más divertido (y útil) analizarlos gráficamente.
-✅ **Mi solución:** Construí un Dashboard interactivo usando **Streamlit**. Transformé un script en texto plano en una aplicación web con pestañas separadas para monitoreo en vivo y otra específicamente para bucear en el **Análisis Exploratorio de Datos (EDA)**.
-
-### 3. Visualizaciones estáticas vs interactivas
-Al crear el EDA, usé librerías básicas. **El problema:** Matplotlib generaba gráficos estáticos, poco atractivos y sin capacidad de hacer zoom en fechas precisas (algo vital en finanzas).
-✅ **Mi solución:** Refactoricé toda la capa visual para usar **Plotly**. Ahora los gráficos de Velas Japonesas, Histogramas y Mapas de Calor de correlación son 100% interactivos y asombrosos.
-
-### 4. Puente hacia Power BI
-Sé que Pandas es genial y hace de todo, pero me dio curiosidad jugar también con **Power BI**. **El problema:** Calcular promedios móviles (SMA, EMA) y bandas de bollinger directamente con fórmulas en DAX es un dolor de cabeza y consume demasiados recursos mentalmente y técnicamente.
-✅ **Mi solución:** Desarrollé un script ETL (`export_powerbi.py`) en Python que usa Pandas para precalcular todo el análisis técnico, lidiar con los valores nulos (`NaN`) y exportar un dataset plano (`.csv`) listo para ser devorado por Power BI en segundos.
+¡Epa! Bienvenido a **AstroCryptoFeed**. Este proyecto es básicamente el resultado de mi curiosidad infinita por los datos y las criptos. No es solo un bot de Telegram; es todo un experimento donde conecto APIs de Binance y CoinGecko, guardo todo en una base de datos y luego me pongo a inventar con gráficos interactivos y visualizaciones en Power BI. 🧪📊
 
 ---
 
-## 📂 Arquitectura y Navegación
+## 🧠 La Locura Detrás del Proyecto: ¿Qué quise resolver?
 
-He dividido la documentación para que puedas entender cada pieza del rompecabezas. Te invito a leer los READMEs específicos en cada carpeta:
+Al principio solo quería que un bot me avisara si el Bitcoin subía, pero después me puse creativo (o loco, ajajaja) y terminé armando todo este ecosistema. Aquí te cuento los rollos que tuve y cómo los saqué adelante:
 
-*   🤖 [`astro-bot/README.md`](astro-bot/README.md) - El motor de recolección de datos y Feature Engineering.
-*   📊 [`dashboard/README.md`](dashboard/README.md) - La aplicación web Streamlit y la lógica de visualización (Plotly).
-*   ⚙️ [`scripts/README.md`](scripts/README.md) - El pipeline de extracción ETL hacia Power BI.
-*   ⚡ [`activepieces/README_AP.md`](activepieces/README_AP.md) - Configuración para orquestación de flujos (Webhooks).
+### 1. ¿Donde guardo tanta info? (Adiós CSV, hola SQL) 💾
+Empecé guardando todo en archivos `.csv`, pero eso se puso súper pesado y se trababa cuando quería leer y escribir al mismo tiempo. 
+*   **Mi solución:** Metí todo en una base de datos **SQLite** usando SQLAlchemy. Ahora todo fluye de buena forma, hago mis consultas SQL y los datos están seguros y organizados.
 
-## 🚀 Cómo Iniciar el Proyecto
+### 2. De ver texto plano a ver gráficos brutales 📈
+Mirar la terminal es aburrido después de un rato, osea, necesitaba ver la acción en vivo. 
+*   **Mi solución:** Monté un Dashboard con **Streamlit**. Separé una parte para ver los precios en tiempo real y otra especial para mi "Análisis Exploratorio de Datos" (EDA) donde me pongo a ver historiales.
 
-1. **Clona y Configura**:
-   ```bash
-   cp .env.example .env
-   ```
-   *(Rellena tus credenciales de Binance y Telegram en el `.env`)*
+### 3. ¡Quiero interactividad! (Plotly al rescate) 🕹️
+Los gráficos de Matplotlib eran muy estáticos, no podía hacer zoom ni ver detalles. 
+*   **Mi solución:** Cambié todo a **Plotly**. Ahora tengo velas japonesas y mapas de calor que se ven increíbles y son 100% interactivos. ¡Se ve demasiado pro!
 
-2. **Levanta la Infraestructura (Docker)**:
-   Empaqueté todo en contenedores para que no tengas problemas de dependencias en tu máquina. Construye y corre el proyecto en segundo plano con este comando:
-   ```bash
-   docker-compose up --build -d
-   ```
-
-3. **¡Pruébalo en tu Teléfono! (Telegram)**:
-   - Abre Telegram y busca tu bot.
-   - Escribe el comando `/start`.
-   - Verás un menú interactivo con botones. Puedes tocar "Precio BTC" o usar comandos como `/precio SOLUSDT` y `/resumen`.
-   - Si quieres ver lo que el bot está haciendo por detrás (logs), corre en tu consola:
-     ```bash
-     docker-compose logs -f astro-bot
-     ```
-
-4. **Explora los Datos Visualmente**:
-   - Entra al Dashboard web en: `http://localhost:8501`
-   - Si quieres jugar con Power BI, corre `python scripts/export_powerbi.py` y conecta Power BI Deskstop al archivo generado en `shared/data/powerbi_dataset.csv`.
-
-¡Disfruta explorando el código!
+### 4. El puente a Power BI 👔
+Me dio por jugar con herramientas de BI, pero calcular cosas raras (como RSI o medias móviles) dentro de Power BI es un dolor de cabeza rudo.
+*   **Mi solución:** Hice un script de Python (`export_powerbi.py`) que hace todo el trabajo sucio. Calcula los indicadores, limpia los nulos y me deja un regalito: un `.csv` perfecto listo para que Power BI lo devore sin esfuerzo.
 
 ---
 
-## ⚠️ Aviso Legal / Disclaimer
+## 📂 Mapa del Laboratorio (Arquitectura)
 
-**¡Atención!** Este proyecto es **puramente educativo y experimental**. 
-* **NO es asesoramiento financiero (Not Financial Advice - NFA).** 
-* **NO es una "fórmula mágica" para hacerse millonario.** 
-* Las criptomonedas son activos extremadamente volátiles. Los indicadores técnicos que se calculan aquí (RSI, Medias Móviles, Bandas de Bollinger, etc.) representan modelos matemáticos sobre datos pasados y **nunca** garantizan resultados futuros.
-* Úsalo bajo tu propio riesgo para aprender sobre datos, código e integraciones de software. ¡Juega seguro!
+He organizado todo en carpetas para no volverme loco. Aquí puedes ver cada pieza:
+
+| Carpeta | ¿Qué hay ahí? |
+| :--- | :--- |
+| 🤖 [`astro-bot/`](astro-bot/README.md) | Aquí vive el bot que extrae los datos y hace la magia técnica. |
+| 📊 [`dashboard/`](dashboard/README.md) | La web con Streamlit y los gráficos interactivos de Plotly. |
+| ⚙️ [`scripts/`](scripts/README.md) | El pipeline que prepara los datos para Power BI. |
+| ⚡ [`activepieces/`](activepieces/README_AP.md) | La parte de automatización con webhooks (súper útil). |
+
+---
+
+## 🚀 Cómo poner a correr este monstruo
+
+1.  **Configura tu ambiente**:
+    Copia el archivo de ejemplo y pon tus llaves:
+    ```bash
+    cp .env.example .env
+    ```
+2.  **Dale vida con Docker**:
+    Usa este comando para que todo se instale y corra solito:
+    ```bash
+    docker-compose up --build -d
+    ```
+3.  **Habla con el bot**:
+    Busca tu bot en Telegram, dale `/start` y ¡listo! Toca los botones para ver el precio o usa `/precio BTCUSDT`.
+4.  **Mira la web**:
+    Entra a `http://localhost:8501` para ver el Dashboard.
+
+---
+
+## ⚠️ ¡Cuidado aquí! (Aviso Legal)
+
+**¡Ojo!** Esto es puro experimento educativo. 
+*   **NO es consejo financiero.** No me culpes si el mercado se vuelve loco, ajajaja.
+*   Las criptos son volátiles de una forma ruda. Úsalo para aprender, no para apostar la casa. ¡Sé responsable! 🖖
+
+---
+*Hecho por un mini científico loco que ama los datos.* 👨‍🔬🧠

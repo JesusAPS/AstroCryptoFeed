@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 import os
 import sys
 
-# Ajustar path para importar módulos desde astro-bot
+# Truco para poder importar mis funciones desde la otra carpeta (astro-bot)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'astro-bot')))
 
 try:
@@ -12,7 +12,7 @@ except ImportError:
     print("Asegúrate de ejecutar este script desde la raíz del proyecto o instala los requisitos.")
     sys.exit(1)
 
-# Determinar ruta de la BD dependiendo de si estamos en Docker o local
+# Buscando dónde está la base de datos (Docker o local)
 db_relative = os.path.join(os.path.dirname(__file__), '..', 'shared', 'data', 'crypto_data.db')
 DB_PATH = f'sqlite:///{os.path.abspath(db_relative)}'
 
@@ -21,15 +21,14 @@ EXPORT_PATH = os.path.abspath(export_relative)
 
 def export_data_for_powerbi():
     """
-    Extrae datos de SQLite, procesa y calcula indicadores técnicos en batch, y 
-    exporta a un CSV limpio ideal para ingestar en Power BI.
+    Aquí hago toda la magia de extraer datos y calcular indicadores en lote para Power BI.
     """
     print("🚀 Iniciando exportación y transformación de datos para Power BI...")
     
     engine = create_engine(DB_PATH)
     
     try:
-        # 1. Extracción (Extract)
+        # 1. Sacando la data de la base de datos (Extract)
         query = "SELECT * FROM prices ORDER BY timestamp ASC"
         df = pd.read_sql(query, engine)
         
@@ -37,31 +36,31 @@ def export_data_for_powerbi():
             print("⚠️ No hay datos en la base de datos para exportar.")
             return
 
-        print(f"✅ {len(df)} registros extraídos. Calculando características (Feature Engineering)...")
+        print(f"✅ {len(df)} registros extraídos. Haciendo mi magia de Feature Engineering...")
         
-        # 2. Transformación (Transform)
+        # 2. Aplicando mi ciencia a los datos (Transform)
         df_processed = pd.DataFrame()
         
-        # Agrupamos por activo para no mezclar las medias móviles de BTC con ETH
+        # Separando cada cripto para no mezclar peras con manzanas (BTC vs ETH)
         for symbol in df['symbol'].unique():
             df_sym = df[df['symbol'] == symbol].copy()
             
-            # Crear columna 'close' temporalmente para reutilizar la lógica de analysis.py
+            # Necesito llamar al precio 'close' para que mi lógica de analysis.py lo entienda
             df_sym['close'] = df_sym['price']
             
-            # Calcular indicadores técnicos
+            # Haciendo los cálculos financieros pro (RSI, Medias, etc.)
             df_sym = calculate_technical_indicators(df_sym)
             
-            # Limpiar columnas innecesarias
+            # Borrando las columnas temporales para que el archivo sea ligero
             df_sym = df_sym.drop(columns=['close'])
             
             df_processed = pd.concat([df_processed, df_sym])
             
-        # Rellenar valores nulos (NaN) generados por los periodos de las medias móviles
-        # Usamos backfill para garantizar que Power BI no tenga problemas con filas vacías
+        # Tapando los huecos de los cálculos (NaIs) con Backward Fill
+        # para que Power BI no se confunda con celdas vacías
         df_processed = df_processed.bfill()
         
-        # 3. Carga (Load)
+        # 3. ¡Listo el pollo! A guardar el archivo final (Load)
         os.makedirs(os.path.dirname(EXPORT_PATH), exist_ok=True)
         df_processed.to_csv(EXPORT_PATH, index=False)
         

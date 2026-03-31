@@ -5,19 +5,24 @@ from utils.load_data import load_binance_data, load_coingecko_data, get_aligned_
 from utils.plot import plot_price_line, plot_candlestick, plot_returns_histogram, plot_correlation_matrix
 from utils.format import format_change
 
+import os
+
 st.set_page_config(page_title="AstroCryptoFeed Dashboard", layout="wide")
 
-st.image("assets/logo.png", width=100)
+logo_path = "assets/logo.png"
+if os.path.exists(logo_path):
+    st.image(logo_path, width=100)
 st.title("🪐 AstroCryptoFeed Dashboard")
+
 st.markdown("_Visualización de datos espaciales y análisis técnico_")
 
-# Creación de Pestañas (Tabs) para separar responsabilidades web
+# Dividiendo el dashboard en secciones para no volverme loco con tanta info
 tab_monitor, tab_eda = st.tabs(["🔴 Monitor en Vivo", "📊 Análisis Exploratorio (EDA)"])
 
 with tab_monitor:
     st.header("Monitor en Tiempo Real")
     
-    # Binance
+    # --- SECCIÓN DE BINANCE ---
     st.subheader("🚀 Binance")
     binance_symbols = load_data.get_available_symbols("Binance")
     if binance_symbols:
@@ -40,7 +45,7 @@ with tab_monitor:
     else:
         st.info("Esperando datos de Binance...")
 
-    # CoinGecko
+    # --- SECCIÓN DE COINGECKO ---
     st.subheader("🛰️ CoinGecko")
     cg_symbols = load_data.get_available_symbols("CoinGecko")
     if cg_symbols:
@@ -66,22 +71,22 @@ with tab_eda:
         df_eda = load_binance_data(eda_symbol, limit=2000)
         
         if not df_eda.empty:
-            # 1. Transformación de Pandas: Resampling a Velas Japonesas (OHLC)
+            # 1. Mi truco de magia: Convertir ticks en Velas Japonesas (OHLC)
             st.subheader("1. Transformación OHLC (Velas Japonesas)")
             st.markdown("Agrupando data cruda (ticks) en intervalos de tiempo para visualizar volatilidad mediante Pandas `resample`.")
-            # Aseguramos el índice de tiempo
+            # El índice tiene que ser de tiempo o esto explota
             df_time = df_eda.set_index('timestamp')
-            # Agrupar en periodos (ej. 1 hora) obteniendo Open, High, Low, Close
+            # Agrupando por horas para ver el Open, High, Low y Close
             ohlc_dict = {'price': ['first', 'max', 'min', 'last']}
             df_ohlc = df_time.resample('1h').agg(ohlc_dict)
             df_ohlc.columns = ['open', 'high', 'low', 'close']
             df_ohlc.dropna(inplace=True)
             plot_candlestick(df_ohlc, f"Velas Japonesas (1H) - {eda_symbol}")
             
-            # 2. Análisis de Retornos y Volatilidad
+            # 2. Midiendo qué tan loco está el mercado (Retornos)
             st.subheader("2. Distribución de Retornos y Volatilidad")
             st.markdown("Cálculo del cambio porcentual serie a serie para encontrar distorsiones en el precio (Riesgo).")
-            # Calcular retorno logarítmico o porcentual con Pandas
+            # Calculando el cambio porcentual con la potencia de Pandas
             df_time['returns'] = df_time['price'].pct_change() * 100
             
             col_stat1, col_stat2, col_stat3 = st.columns(3)
@@ -93,7 +98,7 @@ with tab_eda:
             
             plot_returns_histogram(df_time.dropna(subset=['returns']), "Histograma de Retornos (%)")
 
-            # 3. Correlación entre Activos
+            # 3. ¿Se mueven igual? (Matriz de Correlación)
             st.subheader("3. Matriz de Correlación entre Activos")
             st.markdown("Análisis matricial para encontrar dependencias lineales entre distintos activos.")
             df_aligned = get_aligned_prices("Binance")

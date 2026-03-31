@@ -1,105 +1,66 @@
-# 🧩 Guía de Integración con Activepieces
+# 🧩 El Lab de Automatización con Activepieces
 
-AstroCryptoFeed usa **Activepieces Cloud** como orquestador de automatización para generar y publicar contenido en Binance Square de forma semi-automática.
+AstroCryptoFeed se volvió súper inteligente con **Activepieces Cloud**. Aquí es donde orquesto todo de forma semiautomática para generar y publicar mi contenido en Binance Square sin volverme loco. ⚡🚀
 
-## Arquitectura del Flujo
+---
+
+## 🏗️ La Arquitectura de Mi Flujo (Mi Invento 🧪)
 
 ```
-⏰ Schedule (8:00, 16:00, 20:00 VET)
-  → 📰 HTTP GET: RSS de CoinTelegraph
-    → 🤖 Google Gemini: Genera post optimizado
-      → 📱 Telegram: Envía borrador al chat
-        → ✅/🔄 Telegram: Botones de Aprobar/Rechazar
-          → 🚀 HTTP POST: Webhook al bot en Render
-            → 📢 Bot: Publica en Binance Square via OpenAPI
+⏰ Alarma (8:00, 16:00, 20:00 VET)
+  → 📰 Lee Noticias: RSS de CoinTelegraph
+    → 🤖 Google Gemini: Crea un post de calidad
+      → 📱 Telegram: Me manda el borrador
+        → ✅/🔄 Yo decido: ¿Aprobar o Reintentar?
+          → 🚀 Webhook: Envía la señal al bot en Render
+            → 📢 Publicar: ¡Sale a Binance Square! 
 ```
 
-## Piezas Utilizadas
+---
 
-| Pieza | Versión | Función |
-|-------|---------|---------|
-| `@activepieces/piece-schedule` | ~0.1.17 | Trigger programado (cron) |
-| `@activepieces/piece-http` | ~0.11.7 | Extraer RSS y enviar webhook |
-| `@activepieces/piece-google-gemini` | ~0.1.4 | Generar contenido con IA |
-| `@activepieces/piece-telegram-bot` | ~0.5.6 | Notificaciones y aprobación |
+## 🛠️ Piezas que usé en mi experimento
 
-## Descripción de Cada Paso
+| Pieza | ¿Qué hace? |
+| :--- | :--- |
+| `piece-schedule` | Mi despertador personal (Cron). |
+| `piece-http` | El que agarra las noticias y lanza el webhook. |
+| `piece-google-gemini` | El cerebro de IA que escribe los posts. |
+| `piece-telegram-bot` | Mi asistente que me avisa y me pide permiso. |
 
-### 1. Trigger — Schedule (Cron)
-- **Horarios:** `0 8,16,20 * * *` (8:00 AM, 4:00 PM, 8:00 PM)
-- **Zona horaria:** `America/Caracas`
+---
 
-### 2. step_2 — Extraer Noticias (HTTP GET)
-- **URL:** `https://cointelegraph.com/rss`
-- **Método:** GET
-- **Salida:** XML/RSS con las últimas noticias cripto
+## 🧪 Los Pasos Detrás del Invento (Mi Lógica)
 
-### 3. step_1 — Generar Contenido (Google Gemini)
-- **Modelo:** `gemini-2.5-flash`
-- **Prompt:** Estratega de contenido de Binance Square que analiza noticias de CoinTelegraph
-- **Reglas del prompt:**
-  - Gancho con emojis en MAYÚSCULAS
-  - Máximo 2 frases en el cuerpo
-  - Cashtag obligatorio ($BTC, $ETH, $BNB, etc.)
-  - Pregunta abierta para interacción
-  - Hashtags: #Binance #CryptoNews + 1 específico
-  - **TEXTO PLANO** (sin Markdown)
-  - Máximo 1000 caracteres
+1.  **Trigger (Schedule):** Se activa a las 8 AM, 4 PM y 8 PM (hora de Venezuela).
+2.  **Leer noticias:** Uso un GET HTTP para sacar lo último de CoinTelegraph. 📰
+3.  **Gemini al ataque:** El modelo `gemini-2.5-flash` analiza la noticia y escribe un post de Binance Square con:
+    *   Un gancho fuerte con emojis. 💥
+    *   Cashtags obligatorios ($BTC, $ETH).
+    *   Preguntas para que la gente comente.
+    *   Hashtags pro: #Binance #CryptoNews.
+4.  **Borrador a Telegram:** Me manda el texto para que yo lo vea.
+5.  **Permiso de Científico Loco:** Aparecen dos botones: **✅ Aprobar** o **🔄 Reintentar**. ¡Yo tengo el control total! 🕹️
+6.  **Publicar:** Si apruebo, se envía un POST a Render y ¡listo! Publicado en Binance Square.
 
-### 4. step_4 — Enviar Borrador a Telegram
-- **Acción:** `send_text_message`
-- **Formato:** HTML
-- **Chat ID:** `1540989235`
-- Envía el texto generado por Gemini para revisión
+---
 
-### 5. step_3 — Solicitar Aprobación (Telegram)
-- **Acción:** `request_approval_message`
-- **Botón Aprobar:** `✅ Aprobar`
-- **Botón Rechazar:** `🔄 Generar otro (Reintentar)`
+## ⚙️ Lo que Necesitas Configurar en Render
 
-### 6. step_5 — Router (Decisión)
-- **Condición:** `step_3['approved'] == True` (case insensitive)
-- **Branch 1 (Aprobado):** Ejecuta step_6 (publicar)
-- **Branch 2 (Rechazado):** Ejecuta step_7 (mensaje de rechazo)
+Si quieres clonar mi invento, asegúrate de tener estas variables de entorno en Render:
 
-### 7. step_6 — Publicar en Binance Square (HTTP POST)
-- **URL:** `https://astrocryptofeed.onrender.com/webhook/publish`
-- **Método:** POST
-- **Headers:** `Content-Type: application/json`
-- **Body:** `{ "content": "{{step_1}}" }`
-- El bot en Render recibe el texto y usa la API de Binance Square con el header `X-Square-OpenAPI-Key`
+| Variable | ¿Para qué es? |
+| :--- | :--- |
+| `BINANCE_SQUARE_API_KEY` | Mi llave de Binance Square (Ojo: ¡expira cada 30 días!). |
+| `BINANCE_API_KEY / SECRET` | Mis llaves generales de Binance. |
+| `TELEGRAM_BOT_TOKEN / ID` | Las llaves de mi bot y mi chat de Telegram. |
+| `ACTIVEPIECES_WEBHOOK_URL` | La dirección del webhook de Activepieces. |
 
-### 8. step_7 — Mensaje de Rechazo (Telegram)
-- Envía un mensaje informando que el post fue descartado
+---
 
-## Variables de Entorno Requeridas en Render
+## 🧪 Mantenimiento de Mi Lab
 
-| Variable | Descripción |
-|----------|-------------|
-| `BINANCE_SQUARE_API_KEY` | API Key de Binance Square OpenAPI (expira cada ~30 días) |
-| `BINANCE_API_KEY` | API Key general de Binance |
-| `BINANCE_API_SECRET` | API Secret de Binance |
-| `TELEGRAM_BOT_TOKEN` | Token del bot de Telegram |
-| `TELEGRAM_CHAT_ID` | ID del chat de Telegram |
-| `ACTIVEPIECES_WEBHOOK_URL` | URL del webhook de Activepieces |
+*   **Renueva tu API Key de Binance Square:** Hazlo cada **25-30 días** en la configuración de OpenAPI de Binance Square. Si te sale el error `220004`, ¡es porque se venció! Genera una nueva y cámbiala en Render. 
+*   **Importar el flujo:** Puedes subir mi archivo `Automatizacion.json` directamente a Activepieces Cloud. ¡Solo recuerda reconectar tus llaves (Gemini y Telegram) si aparecen en rojo! 🔴✨
 
-## Conexiones en Activepieces
-
-- **Google Gemini:** API Key de Google AI Studio (conexión `XpbRUZyVktwSfr6qeWKNn`)
-- **Telegram Bot:** Token del bot (conexión `sjGWK712zYSoAEwnMITeL`)
-
-> ⚠️ **Nota:** Después de importar `Automatizacion.json`, verifica que las conexiones estén activas. Si aparecen en rojo, re-selecciona las credenciales.
-
-## Importar el Flujo
-
-1. Ve a **Activepieces Cloud** → Tu proyecto
-2. Clic en `...` → **Import Flow**
-3. Selecciona `activepieces/Automatizacion.json`
-4. Verifica las conexiones (Gemini y Telegram)
-5. Publica el flujo
-
-## Mantenimiento
-
-- **API Key de Binance Square:** Renueva cada **25-30 días** en Binance → Square → OpenAPI Settings
-- **Si recibes error `220004`:** La API Key expiró, genera una nueva y actualiza en Render
-- **Si recibes error `220003`:** Verifica el nombre de la variable en Render (`BINANCE_SQUARE_API_KEY`)
+---
+*Hecho por un mini científico loco que ama automatizarlo todo.* 👨‍🔬🤖
