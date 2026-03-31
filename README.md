@@ -26,13 +26,24 @@ Siempre quise probar herramientas de BI, pero calcular indicadores técnicos (co
 
 ---
 
+## 🤖 Interacción con el Bot de Telegram
+
+Parte vital de este proyecto es cómo consumo la data en el día a día. Cuadré un Bot de Telegram que no solo me avisa cuando algo se mueve rudo, sino que me permite interactuar con el sistema directamente:
+
+*   **Comandos Interactivos:** Al darle `/start`, el bot despliega botones para ver rápidamente el precio de las criptos top ($BTC, $ETH, $BNB, etc.). ⚡
+*   **Consultas a Medida:** Si quiero saber el precio de cualquier otro par en Binance, solo uso el comando `/precio SYMBOL` y me trae la información al momento.
+*   **Alertas Técnicas Inteligentes:** El bot no solo manda el precio; me avisa si un activo está en **sobrecompra** o **sobreventa** basado en el RSI calculado en el motor. También integra el sentimiento del mercado (Fear & Greed) para que el panorama esté completo. 🚨📈
+*   **Resúmenes Rápidos:** A través del menú interactivo, se pueden pedir resúmenes técnicos sin necesidad de entrar al Dashboard web. ¡Todo el control en la palma de mi mano! 📱✨
+
+---
+
 ## 📂 Arquitectura del Proyecto
 
 He organizado todo por carpetas para que la navegación sea sencilla y clara:
 
 | Carpeta | Descripción |
 | :--- | :--- |
-| 🤖 [`astro-bot/`](astro-bot/README.md) | El motor que extrae la data y calcula los indicadores técnicos. |
+| 🤖 [`astro-bot/`](astro-bot/README.md) | El motor que extrae la data y el cerebro del Bot de Telegram. |
 | 📊 [`dashboard/`](dashboard/README.md) | La aplicación web con Streamlit y los gráficos interactivos. |
 | ⚙️ [`scripts/`](scripts/README.md) | El pipeline que prepara la data para Power BI. |
 | ⚡ [`activepieces/`](activepieces/README_AP.md) | La automatización de flujos con webhooks y publicaciones. |
@@ -42,19 +53,19 @@ He organizado todo por carpetas para que la navegación sea sencilla y clara:
 ## 🛠️ Cómo Iniciar el Sistema
 
 1.  **Configura tu ambiente**:
-    Copia el archivo de ejemplo y pon tus credenciales:
+    Copia el archivo de ejemplo y pon tus credenciales (API Keys, Tokens):
     ```bash
     cp .env.example .env
     ```
 2.  **Levanta todo con Docker**:
-    Usa este comando para que los contenedores se encarguen de todo:
+    Usa este comando para que los contenedores se encarguen de orquestar el sistema:
     ```bash
     docker-compose up --build -d
     ```
 3.  **Chequea el Bot**:
-    Busca tu bot en Telegram y dale `/start`. Puedes usar comandos como `/precio BTCUSDT` o ver el resumen con los botones.
+    Busca tu bot en Telegram y dale `/start`. Prueba los comandos interactivos para ver la data en tiempo real.
 4.  **Entra al Dashboard**:
-    Abre `http://localhost:8501` en tu navegador para ver los gráficos en vivo.
+    Abre `http://localhost:8501` en tu navegador para ver los gráficos interactivos.
 
 ---
 
@@ -62,7 +73,7 @@ He organizado todo por carpetas para que la navegación sea sencilla y clara:
 
 Esta herramienta es **estrictamente educativa**.
 *   **No es asesoría financiera.**
-*   El mercado cripto es volátil y rudo. Usa estos datos solo para aprender sobre ingeniería de datos y análisis. ¡Sé responsable con tu dinero! 🖖
+*   El mercado cripto es volátil. Usa estos datos solo para aprender sobre ingeniería de datos y análisis técnico. ¡Sé responsable con tu dinero! 🖖
 
 ---
 *Desarrollado con pasión por los datos y la tecnología.* 👨‍💻🛰️
