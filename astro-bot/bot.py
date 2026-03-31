@@ -16,18 +16,18 @@ from tg_bot.bot_app import create_bot_app
 import nest_asyncio
 from aiohttp import web
 
-# Por si acaso necesito correr esto en entornos raros (asyncio)
+# Por si acaso necesito correr esto en entornos asíncronos especiales
 nest_asyncio.apply()
 
-# Mis variables para elegir qué criptos vigilar
+# Variables para chequear qué criptos voy a vigilar
 CHECK_INTERVAL = int(os.getenv('CHECK_INTERVAL', 60))
 ALERT_PERCENT = float(os.getenv('ALERT_PERCENT', 5.0))
 
-# Limpiando las listas de los pares que configuré
+# Configurando las listas de pares desde el ambiente
 BINANCE_PAIRS = os.getenv('BINANCE_PAIRS', 'BTCUSDT').split(',')
 COINGECKO_IDS = os.getenv('COINGECKO_IDS', 'bitcoin').split(',')
 
-# Para que el bot no se vuelva loco mandando mil mensajes iguales
+# Evitando que el bot mande mil alertas iguales por segundo
 last_alerts = {}
 ALERT_COOLDOWN_SECONDS = 3600  # 1 hora de espera entre alertas del mismo par
 
@@ -59,12 +59,12 @@ def format_alert_message(name, price, change, source, rsi=None, signal="NEUTRAL"
     return msg
 
 async def data_collection_loop():
-    """Aquí es donde el bot se pone a trabajar sin parar buscando precios."""
+    """Aquí el bot se queda activo dándole a la búsqueda de precios sin parar."""
     logger.info("📡 Iniciando subproceso de recolección de datos...")
     
     while True:
         try:
-            # --- BUSCANDO EN BINANCE ---
+            # --- CHEQUEANDO BINANCE ---
             for symbol in BINANCE_PAIRS:
                 symbol = symbol.strip()
                 try:
@@ -72,13 +72,13 @@ async def data_collection_loop():
                     klines_df = get_historical_klines(symbol, limit=100)
                     
                     if binance_data and not klines_df.empty:
-                        # Aplicando mi ciencia de indicadores técnicos
+                        # Aplicando el análisis técnico a los datos
                         indicators_df = calculate_technical_indicators(klines_df)
                         current_rsi = indicators_df['rsi'].iloc[-1]
                         signal_text, signal_emoji = get_signal(current_rsi)
                         full_signal = f"{signal_emoji} {signal_text}"
 
-                        # --- AGREGANDO MÁS DATA (Sentimiento y L/S) ---
+                        # --- AGREGANDO DATA EXTRA (Sentimiento y L/S) ---
                         sentiment = get_fear_and_greed()
                         ls_ratio = get_binance_long_short_ratio(symbol)
                         
@@ -86,13 +86,13 @@ async def data_collection_loop():
                         fng_text = sentiment['sentiment'] if sentiment else "Desconocido"
                         ls_val = ls_ratio['long_short_ratio'] if ls_ratio else None
 
-                        # Guardando todo en mi base de datos personalizada
+                        # Guardando todo en mi base de datos
                         binance_data['rsi'] = current_rsi
                         binance_data['fear_greed'] = fng_value
                         binance_data['long_short_ratio'] = ls_val
                         save_data(binance_data)
 
-                        # Revisando si tengo que avisar algo al jefe
+                        # Verificando si hay que mandar alertas
                         is_price_alert = abs(binance_data['change']) >= ALERT_PERCENT
                         is_technical_alert = "SOBRE" in signal_text
                         is_extreme_rsi = current_rsi < 30 or current_rsi > 70
@@ -101,7 +101,7 @@ async def data_collection_loop():
                             current_time = time.time()
                             last_alert_time = last_alerts.get(symbol, 0)
                             
-                            # ¿Ya pasó una hora desde la última alerta? Para no cansar.
+                            # ¿Ya pasó una hora desde la última alerta? Para no saturar.
                             if current_time - last_alert_time >= ALERT_COOLDOWN_SECONDS:
                                 msg = format_alert_message(
                                     binance_data['symbol'], 
@@ -141,7 +141,7 @@ async def data_collection_loop():
                 except Exception as e:
                     logger.error(f"Error procesando {symbol}: {e}")
                 
-            # --- AHORA VAMOS CON COINGECKO ---
+            # --- PASANDO A COINGECKO ---
             for token_id in COINGECKO_IDS:
                 token_id = token_id.strip()
                 try:
@@ -181,15 +181,15 @@ async def data_collection_loop():
         await asyncio.sleep(CHECK_INTERVAL)
 
 async def main():
-    """El gran inicio de todo mi sistema de científico loco."""
-    init_db() # Iniciando la base de datos
+    """El punto de inicio de todo el sistema."""
+    init_db() # Iniciando la base de datos de buena forma
     logger.info("🚀 Astro-Bot iniciado")
     logger.info(f"Configuración: {len(BINANCE_PAIRS)} pares en Binance y {len(COINGECKO_IDS)} en CoinGecko")
     
-    # Revisando que mis llaves no estén vencidas
+    # Chequeando que mis llaves no estén vencidas
     check_api_key_expiry()
     
-    # Encendiendo el bot para que hable con la gente
+    # Encendiendo el bot de Telegram
     app = create_bot_app()
     if app:
         logger.info("🤖 Bot de Telegram Interactivo preparado.")
@@ -198,7 +198,7 @@ async def main():
         await app.start()
         await app.updater.start_polling()
 
-    # --- SERVIDOR WEB PARA QUE RENDER NO SE QUEJE ---
+    # --- ESTE SERVIDOR ES PARA QUE RENDER NO SE TRABE ---
     # Render exige que los "Web Services" escuchen en un puerto HTTP para saber que están vivos.
     async def handle_ping(request):
         return web.Response(text="AstroCryptoFeed Bot is alive and running!")

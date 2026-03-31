@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 import os
 import sys
 
-# Truco para poder importar mis funciones desde la otra carpeta (astro-bot)
+# Ajustar el path para poder importar módulos desde la carpeta astro-bot
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'astro-bot')))
 
 try:
@@ -21,7 +21,7 @@ EXPORT_PATH = os.path.abspath(export_relative)
 
 def export_data_for_powerbi():
     """
-    Aquí hago toda la magia de extraer datos y calcular indicadores en lote para Power BI.
+    Extrae datos de SQLite y calcula los indicadores técnicos en lote para Power BI.
     """
     print("🚀 Iniciando exportación y transformación de datos para Power BI...")
     
@@ -36,7 +36,7 @@ def export_data_for_powerbi():
             print("⚠️ No hay datos en la base de datos para exportar.")
             return
 
-        print(f"✅ {len(df)} registros extraídos. Haciendo mi magia de Feature Engineering...")
+        print(f"✅ {len(df)} registros extraídos. Ejecutando el Feature Engineering...")
         
         # 2. Aplicando mi ciencia a los datos (Transform)
         df_processed = pd.DataFrame()
@@ -45,10 +45,10 @@ def export_data_for_powerbi():
         for symbol in df['symbol'].unique():
             df_sym = df[df['symbol'] == symbol].copy()
             
-            # Necesito llamar al precio 'close' para que mi lógica de analysis.py lo entienda
+            # Necesito que la columna se llame 'close' para que la lógica de analysis.py funcione
             df_sym['close'] = df_sym['price']
             
-            # Haciendo los cálculos financieros pro (RSI, Medias, etc.)
+            # Calculando los indicadores financieros (RSI, Medias, etc.)
             df_sym = calculate_technical_indicators(df_sym)
             
             # Borrando las columnas temporales para que el archivo sea ligero
@@ -56,11 +56,11 @@ def export_data_for_powerbi():
             
             df_processed = pd.concat([df_processed, df_sym])
             
-        # Tapando los huecos de los cálculos (NaIs) con Backward Fill
-        # para que Power BI no se confunda con celdas vacías
+        # Rellenando los valores nulos (NaN) con Backward Fill
+        # para que Power BI no tenga problemas con filas vacías
         df_processed = df_processed.bfill()
         
-        # 3. ¡Listo el pollo! A guardar el archivo final (Load)
+        # 3. Carga final: Guardar el archivo listo para usar (Load)
         os.makedirs(os.path.dirname(EXPORT_PATH), exist_ok=True)
         df_processed.to_csv(EXPORT_PATH, index=False)
         

@@ -1,31 +1,31 @@
-# 🤖 Astro-Bot - El Motor de Mi Laboratorio Cripto
+# 🤖 Astro-Bot - El Motor de Ingesta y Feature Engineering
 
-¡Bienvenido al corazón de **AstroCryptoFeed**! Esta es la carpeta donde vive toda la lógica para conectarse con el mundo (APIs), agarrar la info y darle forma antes de guardarla. Aquí es donde ocurre la verdadera magia de Python y los inventos de un científico loco. 🧪✨
-
----
-
-## 🧩 ¿Qué inventos hay aquí adentro?
-
-*   **`bot.py`**: Es el cerebro principal. Se queda corriendo por siempre (dentro de Docker) llamando a todas las APIs sin cansarse.
-*   **`utils/fetch_binance.py` y `fetch_coingecko.py`**: Son como los tentáculos que agarran los datos de afuera.
-*   **`utils/analysis.py`**: **¡Aquí es donde Pandas brilla!** Calculo los indicadores técnicos para que el proyecto no sea un simple bot de precios, sino algo pro de análisis de mercado.
-*   **`utils/database.py` y `save.py`**: Donde guardo todo en la base de datos SQLite para que no se pierda nada.
+¡Bienvenido al núcleo de **AstroCryptoFeed**! Esta carpeta contiene toda la lógica encargada de conectarse con el exterior (APIs), recolectar la información y cuadrarla antes de guardarla. Aquí es donde ocurre la verdadera magia de Python y el análisis técnico. ✨🛰️
 
 ---
 
-## 🏗️ Los Retos de un Científico Loco y Cómo los Vencí
+## 📂 ¿Qué hay dentro del motor?
 
-### 1. El precio no lo es todo... 📉
-Al principio mi bot solo avisaba si el Bitcoin caía, pero me di cuenta de que eso no servía de mucho sin contexto. Osea, le faltaba "condimento".
-*   **Mi solución:** Le metí **Feature Engineering** usando la librería `ta`. Ahora extraigo el historial y calculo el **RSI (la fuerza)**, **Medias Móviles (para ver la tendencia)** y las **Bandas de Bollinger**. ¡Ahora sí tengo data de calidad! 💎
-
-### 2. ¡El bot se me moría a cada rato! 💀
-Si el internet fallaba o la API de Binance se ponía pesada, el script se cerraba y me dejaba sin datos a mitad de la noche. Un desastre total.
-*   **Mi solución:** Lo hice súper resistente (resiliente, como dicen los cracks) usando bloques `try-except` en cada llamada. Ahora, si algo falla, mi **Logger (`utils/logger.py`)** anota qué pasó y el bot sigue adelante como si nada. ¡Nada lo detiene! 🛡️
-
-### 3. El lío de organizar tanta data 🗃️
-Con tantos indicadores, los archivos de texto eran un caos total. Necesitaba algo organizado de buena forma.
-*   **Mi solución (`database.py`):** Usé **SQLAlchemy**. Esto me permite manejar mi base de datos SQLite como un profesional, sin escribir SQL crudo y manteniendo todo limpio y seguro. ¡Es una belleza!
+- `bot.py`: Es el cerebro principal. Se ejecuta infinitamente (dentro de Docker) orquestando las llamadas a las APIs.
+- `utils/fetch_binance.py` y `fetch_coingecko.py`: Los conectores encargados de traer la data.
+- `utils/analysis.py`: **¡Aquí es donde Pandas destaca!** Calculo los indicadores técnicos que hacen que este proyecto pase de ser un "bot que avisa precios" a una herramienta de análisis de mercado real. 📈
+- `utils/database.py` y `save.py`: La persistencia hacia la base de datos (SQLite).
 
 ---
-*Hecho para aprender y experimentar. ¡No lo uses como bola de cristal para trading!* 👨‍🔬🧠
+
+## 🏗️ Retos Técnicos y Cómo los Resolví
+
+### 1. El precio solo no era suficiente... 📉
+Al principio mi bot solo avisaba si el Bitcoin caía, pero me di cuenta de que eso no servía de mucho sin contexto.
+*   **Mi solución:** Implementé **Feature Engineering** usando la librería `ta`. Ahora extraigo el historial y calculo el **RSI (Momentum)**, **Medias Móviles (SMA 20, EMA 20)** para ver la tendencia a corto y mediano plazo, y las **Bandas de Bollinger**. ¡Así quedó la data con mucho más valor! 💎
+
+### 2. ¡El bot se caía si fallaba una API! 💀
+Si el internet fallaba o la API de Binance daba error, el script se trancaba y me dejaba sin data a mitad de la noche. 
+*   **Mi solución:** Hice el bot resiliente usando bloques de `try-except` envolviendo cada llamada. Ahora, si algo falla, mi **Logger (`utils/logger.py`)** registra el error ordenadamente y el bucle sigue vivo para el siguiente ciclo. ¡No se detiene por nada! 🛡️🚀
+
+### 3. Gestionando los datos de forma escalable 🗃️
+Con tantos indicadores, no podía seguir usando archivos de texto plano.
+*   **Mi solución (`database.py`):** Configuré **SQLAlchemy**. Esta capa ORM me permitió definir la estructura clara de mis tablas y me olvidé de la sintaxis SQL cruda, organizando todo de forma impecable y segura. ✨🔨
+
+---
+*Hecho para aprender y experimentar con datos reales. Se recomienda usar solo con fines educativos.* 👨‍💻🛰️

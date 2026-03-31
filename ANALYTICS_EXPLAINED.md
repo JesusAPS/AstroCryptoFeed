@@ -1,47 +1,47 @@
-# 🔬 El Laboratorio de Datos: Mi Análisis Paso a Paso
+# 🔬 El Lado de los Datos: Mi Análisis Paso a Paso
 
-Aquí te cuento el lado técnico pero contado por mí, osea, sin rollos aburridos. Me puse a jugar con Pandas y otras librerías para ver qué tanto podía exprimir los datos de cripto. ¡Esta es la parte donde me siento como un mini científico loco! ajajaja. 📈🧪
-
----
-
-## 🏗️ 1. Preparando la Pócima (Limpieza ETL)
-
-Antes de ver gráficos bonitos, tuve que limpiar el desastre de los datos crudos. No es tan fácil como parece, ¡pero aquí hice mi magia! 💪
-
-*   **Poner las fechas en orden:** Los datos de la base de datos vienen como simples textos. Usé `pd.to_datetime()` para que Pandas entienda que son fechas reales. ¡Sin esto, mis gráficos estarían perdidos en el espacio!
-*   **Arreglando los huecos (Manejo de NaNs):** Cuando calculas cosas como el promedio de 20 días, ¡los primeros 19 no existen! Usé `.bfill()` (Backward Fill) para que no me salieran celdas vacías que rompen el dashboard de Power BI. Todo densamente lleno y balanceado. 😎
+Aquí te cuento cómo fue que cuadré la parte analítica. Me puse a jugar con Pandas y otras librerías para ver qué tanto podía exprimir la data cripto, y este es el resultado de mi proceso de ingeniería. 📈✨
 
 ---
 
-## 📊 2. Mi Laboratorio de Datos (EDA en Streamlit)
+## 🏗️ 1. Preparando la Data (Ingesta ETL)
 
-Aquí es donde me pongo a inventar con Pandas para ver qué está pasando con el precio. No es solo mirar una línea; es entender el movimiento:
+Antes de ver gráficos, tuve que poner en orden toda la data de entrada. No fue algo automático, sino que lo orquesté paso a paso:
 
-### El Truco de las Velas (Resampling) 🕯️
+*   **Conversión de Tiempo:** La data en la base de datos llega como texto. Usé `pd.to_datetime()` para que Pandas entienda que son fechas reales y así poder chequear las series temporales sin errores.
+*   **Limpieza de Valores Nulos:** Al calcular indicadores (como el promedio de 20 días), los primeros registros quedan vacíos. Usé `.bfill()` (Backward Fill) para que no salieran huecos que me dañaran los gráficos en Power BI. Así quedó todo denso y bien cuadrado. 😎
+
+---
+
+## 📊 2. El Análisis Exploratorio de Datos (EDA)
+
+Aquí es donde me pongo a usar Pandas de buena forma para entender el movimiento de los precios. No es solo mirar una línea, sino entender qué está pasando realmente:
+
+### Resampling (Velas Japonesas) 🕯️
 Agrupé miles de puntos de precio en velas de 1 hora. Es un truco genial de Pandas que me permite ver:
-*   Donde empezó (**Open**), hasta donde subió (**High**), lo más bajo que cayó (**Low**) y como terminó (**Close**).
+*   Dónde abrió el precio (**Open**), hasta dónde subió (**High**), lo más bajo que cayó (**Low**) y dónde cerró (**Close**). ¡Quedó impecable!
 
-### Midiendo el Nerviosismo (Retornos y Volatilidad) 🌪️
-Calculé cuánto cambia el precio de un momento a otro (`pct_change()`). Esto me dice qué tan loco está el mercado. Con la desviación estándar (`std()`), mido qué tan peligroso es meter dinero ahí. ¡Es pura ciencia del riesgo!
+### Midiendo el Riesgo (Retornos y Volatilidad) 🌪️
+Calculé cuánto cambia el precio de un momento a otro (`pct_change()`). Esto me dice qué tan volátil está el mercado. Con la desviación estándar (`std()`), mido qué tan rudo está el riesgo en ese activo. ¡Es pura ciencia del dato!
 
 ---
 
-## 🧪 3. Mis Indicadores de "Científico Loco"
+## 🧪 3. Los Indicadores que Utilicé
 
-Metí estos indicadores técnicos para que el bot y el dashboard sean más inteligentes:
+He implementado estos indicadores técnicos para que el bot y el dashboard sean más eficientes al dar alertas:
 
-| Herramienta | ¿Para qué sirve? | Mi Toque Técnico 🛠️ |
+| Indicador | Función | Mi Lógica Técnica 🛠️ |
 | :--- | :--- | :--- |
-| **RSI (14)** | Momentum (La fuerza) | Si está arriba de 70, la gente se volvió loca comprando. Si está bajo 30, ¡es un regalo! 🎁 |
-| **SMA/EMA (20)** | La Tendencia | Limpio el "ruido" para ver si vamos para arriba o para abajo de forma real. |
-| **Bollinger Bands** | Volatilidad Visual | Me dice si el precio está muy apretado o está a punto de explotar. 💥 |
+| **RSI (14)** | Momentum (La fuerza) | Si está arriba de 70, la gente está muy eufórica comprando. Si está bajo 30, ¡es un regalo! 🎁 |
+| **SMA/EMA (20)** | La Tendencia | Limpio el "ruido" para ver si la tendencia del mercado va para arriba o para abajo de verdad. |
+| **Bollinger Bands** | Volatilidad Visual | Me dice si el precio está muy apretado o si está por salir disparado. 💥 |
 
 ---
 
-## ⚡ 4. El Puente Veloz a Power BI
+## ⚡ 4. El Puente Veloz hacia Power BI
 
-Hice que mi script `export_powerbi.py` fuera como un cohete. En lugar de hacer fórmulas difíciles dentro de Power BI (que es lentísimo), hice que Python calculara todo de una vez. 🚀
-Asi, Power BI solo recibe una tabla limpia lista para usar. ¡Ahorra tiempo y recursos!
+Hice que mi script `export_powerbi.py` fuera súper eficiente. En lugar de hacer fórmulas difíciles dentro de Power BI con DAX (que es lento), hice que Python lo calculara todo de una vez. 🚀
+Así, Power BI solo recibe una tabla limpia que puedo arrastrar a los gráficos sin que se pegue la computadora. ¡Quedó fino! ✨
 
 ---
-*Si quieres saber más, ¡revisa el código! Está todo comentado con mi estilo.* 👨‍🔬🧠 
+*Si quieres saber más, puedes chequear el código. Está todo comentado paso a paso.* 👨‍💻🛰️ 

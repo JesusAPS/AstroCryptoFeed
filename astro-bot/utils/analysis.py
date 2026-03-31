@@ -5,13 +5,14 @@ from ta.volatility import BollingerBands
 
 def calculate_technical_indicators(df):
     """
-    Aquí es donde aplico la ciencia financiera para sacar el RSI, SMA y demás inventos.
-    Necesito que el DataFrame tenga una columna 'close' para poder trabajar.
+    Calcula los indicadores técnicos como el RSI y las Medias Móviles.
+    Es necesario que el DataFrame tenga una columna 'close' para procesar.
     """
     if df.empty:
         return None
 
-    # El RSI (Fuerza) - Uso 14 periodos para ver si el mercado está eufórico o deprimido
+    # RSI (Relative Strength Index) para medir la fuerza del mercado
+    # Uso 14 periodos para ver el momentum actual
     rsi_indicator = RSIIndicator(close=df['close'], window=14)
     df['rsi'] = rsi_indicator.rsi()
     
@@ -33,7 +34,7 @@ def calculate_technical_indicators(df):
 
 def get_signal(rsi_value):
     """
-    Una función rápida para que el bot me diga qué hacer dependiendo del RSI.
+    Devuelve una señal técnica basada en el valor del RSI.
     """
     if rsi_value is None:
         return "NEUTRAL", "⚪"

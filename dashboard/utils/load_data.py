@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-# Aquí es donde vive la base de datos compartida por todos
+# Ruta de la base de datos compartida
 DB_PATH = 'sqlite:////app/shared/data/crypto_data.db'
 
 def get_engine():
@@ -38,16 +38,16 @@ def load_coingecko_data(symbol=None, limit=100):
 
 def get_aligned_prices(source="Binance", limit=500):
     """
-    Un método para juntar todos los precios y alinearlos perfectamente por hora
-    para poder calcular las correlaciones sin errores.
+    Método para alinear los precios por timestamp (resample por horas)
+    para poder calcular las correlaciones sin errores de desfase.
     """
     symbols = get_available_symbols(source)
     prices_dict = {}
     for sym in symbols:
         df = load_data_from_db(source, sym, limit)
         if not df.empty:
-            # Usando mi magia de Resample para que todos los activos coincidan en el tiempo.
-            # Estos son los trucos de Pandas que me hacen la vida más fácil.
+            # Aplicando el Resample para que todos los activos coincidan en el tiempo.
+            # Estos son los métodos de Pandas que facilitan el análisis.
             df_sym = df.set_index('timestamp').resample('1h')['price'].last()
             prices_dict[sym] = df_sym
             

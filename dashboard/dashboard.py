@@ -16,7 +16,7 @@ st.title("🪐 AstroCryptoFeed Dashboard")
 
 st.markdown("_Visualización de datos espaciales y análisis técnico_")
 
-# Dividiendo el dashboard en secciones para no volverme loco con tanta info
+# Dividiendo el dashboard en secciones para organizar mejor la info
 tab_monitor, tab_eda = st.tabs(["🔴 Monitor en Vivo", "📊 Análisis Exploratorio (EDA)"])
 
 with tab_monitor:
@@ -71,10 +71,10 @@ with tab_eda:
         df_eda = load_binance_data(eda_symbol, limit=2000)
         
         if not df_eda.empty:
-            # 1. Mi truco de magia: Convertir ticks en Velas Japonesas (OHLC)
+            # 1. Transformando los datos de Pandas: Resampling a Velas Japonesas (OHLC)
             st.subheader("1. Transformación OHLC (Velas Japonesas)")
             st.markdown("Agrupando data cruda (ticks) en intervalos de tiempo para visualizar volatilidad mediante Pandas `resample`.")
-            # El índice tiene que ser de tiempo o esto explota
+            # El índice tiene que ser de tiempo para poder graficar
             df_time = df_eda.set_index('timestamp')
             # Agrupando por horas para ver el Open, High, Low y Close
             ohlc_dict = {'price': ['first', 'max', 'min', 'last']}
@@ -83,10 +83,10 @@ with tab_eda:
             df_ohlc.dropna(inplace=True)
             plot_candlestick(df_ohlc, f"Velas Japonesas (1H) - {eda_symbol}")
             
-            # 2. Midiendo qué tan loco está el mercado (Retornos)
+            # 2. Análisis de Retornos y Volatilidad (Midiendo el riesgo)
             st.subheader("2. Distribución de Retornos y Volatilidad")
             st.markdown("Cálculo del cambio porcentual serie a serie para encontrar distorsiones en el precio (Riesgo).")
-            # Calculando el cambio porcentual con la potencia de Pandas
+            # Calculando el cambio porcentual con Pandas
             df_time['returns'] = df_time['price'].pct_change() * 100
             
             col_stat1, col_stat2, col_stat3 = st.columns(3)
@@ -98,7 +98,7 @@ with tab_eda:
             
             plot_returns_histogram(df_time.dropna(subset=['returns']), "Histograma de Retornos (%)")
 
-            # 3. ¿Se mueven igual? (Matriz de Correlación)
+            # 3. Correlación entre Activos (Viendo si se mueven igual)
             st.subheader("3. Matriz de Correlación entre Activos")
             st.markdown("Análisis matricial para encontrar dependencias lineales entre distintos activos.")
             df_aligned = get_aligned_prices("Binance")
