@@ -197,6 +197,17 @@ async def main():
         await app.initialize()
         await app.start()
         await app.updater.start_polling()
+        
+        # Registramos los comandos en el menú "Menú" de Telegram oficial
+        from telegram import BotCommand
+        commands = [
+            BotCommand("start", "Mostrar el panel de control interactivo"),
+            BotCommand("precio", "Ver precio de un par (Ej: /precio BTCUSDT)"),
+            BotCommand("resumen", "Top 3 monedas con mayor volatilidad hoy"),
+            BotCommand("semana", "Estadísticas de la última semana")
+        ]
+        await app.bot.set_my_commands(commands)
+        logger.info("✅ Menú de comandos registrado en Telegram.")
 
     # --- ESTE SERVIDOR ES PARA QUE RENDER NO SE TRABE ---
     # Render exige que los "Web Services" escuchen en un puerto HTTP para saber que están vivos.

@@ -147,6 +147,16 @@ def create_bot_app():
         
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     
+    # Comandos que aparecen en el menú "Menú" de Telegram
+    commands = [
+        ("start", "Iniciar el panel de control"),
+        ("precio", "Ver precio de un par (Ej: /precio BTCUSDT)"),
+        ("resumen", "Top 3 monedas con mayor movimiento hoy"),
+        ("semana", "Estadísticas de volatilidad semanal")
+    ]
+    # No los seteamos aquí directamente porque es asíncrono, 
+    # pero el usuario los puede ver en el código o los registramos en el bot.py
+    
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("precio", price_command))
     app.add_handler(CommandHandler("resumen", resume_command))
