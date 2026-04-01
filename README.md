@@ -24,6 +24,10 @@ Los gráficos básicos eran muy estáticos. No podía hacer zoom ni ver detalles
 Siempre quise probar herramientas de BI, pero calcular indicadores técnicos (como RSI o EMA) dentro de Power BI con DAX es un proceso rudo y lento.
 *   **Mi solución:** Hice un script ETL (`export_powerbi.py`) en Python que hace todo ese trabajo pesado. Calcula los indicadores, limpia los valores nulos y exporta un `.csv` listo para que Power BI lo consuma sin problemas. ⚡
 
+### 5. ¡Mi Primera Automatización! (Orquestación con Activepieces) ⚡🤖
+Aquí es donde el proyecto pasó de ser solo una herramienta de consulta a un sistema que "trabaja solo". Quería automatizar la generación de contenido pero manteniendo el control final.
+*   **Mi solución:** Integré **Activepieces** como orquestador. Ahora tengo un flujo que monitorea noticias en tiempo real, usa IA (Gemini) para crear borradores de posts y me los manda a Telegram. Con un solo botón desde el chat, apruebo la publicación y el sistema lo lanza automáticamente a **Binance Square**. ¡Fue mi primer gran reto de automatización y quedó fino! 🚀✨
+
 ---
 
 ## 🤖 Interacción con el Bot de Telegram
@@ -34,6 +38,7 @@ Parte vital de este proyecto es cómo consumo la data en el día a día. Cuadré
 *   **Consultas a Medida:** Si quiero saber el precio de cualquier otro par en Binance, solo uso el comando `/precio SYMBOL` y me trae la información al momento.
 *   **Alertas Técnicas Inteligentes:** El bot no solo manda el precio; me avisa si un activo está en **sobrecompra** o **sobreventa** basado en el RSI calculado en el motor. También integra el sentimiento del mercado (Fear & Greed) para que el panorama esté completo. 🚨📈
 *   **Resúmenes Rápidos:** A través del menú interactivo, se pueden pedir resúmenes técnicos sin necesidad de entrar al Dashboard web. ¡Todo el control en la palma de mi mano! 📱✨
+*   **Aprobación de Contenido con IA:** Mi bot es el centro de mando. Me envía borradores de noticias generados por la IA en mi flujo de **Activepieces** y me permite aprobar la publicación en Binance Square con un solo toque. 🤖✅
 
 ---
 
